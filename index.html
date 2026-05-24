@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>leafnotes</title>
+<style>
+  :root {
+    --green: #2d6a4f;
+    --green-light: #d8f3dc;
+    --cream: #f5f1eb;
+    --gray: #6c757d;
+    --text: #1a1a1a;
+    --text-soft: #555;
+    --card-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    --card-shadow-hover: 0 6px 20px rgba(0,0,0,0.12);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    line-height: 1.55;
+    padding: 1.5rem 1rem;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+  header {
+    text-align: center;
+    padding: 2.5rem 1rem 2rem;
+  }
+  header h1 {
+    font-size: 2.5rem;
+    color: var(--green);
+    margin-bottom: 0.4rem;
+    letter-spacing: -0.5px;
+  }
+  header p {
+    color: var(--text-soft);
+    font-size: 1rem;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+  .gardens {
+    display: grid;
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+  .garden-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem 1.75rem;
+    box-shadow: var(--card-shadow);
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.15s, box-shadow 0.15s;
+    border-left: 5px solid var(--green);
+  }
+  .garden-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--card-shadow-hover);
+  }
+  .garden-card h2 {
+    font-size: 1.25rem;
+    color: var(--green);
+    margin-bottom: 0.25rem;
+  }
+  .garden-card p {
+    color: var(--text-soft);
+    font-size: 0.9rem;
+  }
+  .garden-card .meta {
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--gray);
+  }
+  footer {
+    text-align: center;
+    margin-top: 2.5rem;
+    color: var(--gray);
+    font-size: 0.85rem;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🌿 leafnotes</h1>
+  <p>Plant catalogs with care info, diagnostic check-ins, and a year-round maintenance timeline. One catalog per garden.</p>
+</header>
+
+<div class="gardens">
+  <a class="garden-card" href="brandon/">
+    <h2>Brandon's Garden</h2>
+    <p>23 varieties planted June 2025. Trees, shrubs, and a mixed perennial bed.</p>
+    <div class="meta">Zone 6a · Maynard, MA</div>
+  </a>
+</div>
+
+<footer>
+  <p>More gardens coming soon.</p>
+</footer>
+
+</body>
+</html>

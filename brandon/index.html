@@ -1,0 +1,1417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brandon's Garden — leafnotes</title>
+<style>
+  :root {
+    --green: #2d6a4f;
+    --green-light: #d8f3dc;
+    --green-pale: #f0f7f4;
+    --cream: #f5f1eb;
+    --gray: #6c757d;
+    --gray-light: #f1f3f5;
+    --text: #1a1a1a;
+    --text-soft: #555;
+    --card-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    --card-shadow-hover: 0 6px 20px rgba(0,0,0,0.12);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    line-height: 1.55;
+    padding: 1rem;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  header {
+    background: var(--green);
+    color: white;
+    padding: 2rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+  }
+  header h1 { font-size: 1.85rem; margin-bottom: 0.3rem; }
+  header p { opacity: 0.92; font-size: 0.95rem; }
+  header .meta { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 0.85rem; font-size: 0.85rem; }
+  header .meta span { background: rgba(255,255,255,0.2); padding: 0.25rem 0.75rem; border-radius: 20px; }
+
+  section { margin-bottom: 1.5rem; }
+  section > h2 {
+    font-size: 1.35rem;
+    color: var(--green);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--green-light);
+  }
+  .panel { background: white; border-radius: 12px; padding: 1.5rem 2rem; box-shadow: var(--card-shadow); }
+  .panel h2 { color: var(--green); font-size: 1.25rem; margin-bottom: 0.5rem; border-bottom: none; padding-bottom: 0; }
+  .panel .lede { color: var(--text-soft); font-size: 0.9rem; margin-bottom: 0.85rem; }
+
+  .this-month { border-left: 5px solid var(--green); }
+  .this-month ul { list-style: none; }
+  .this-month li {
+    padding: 0.4rem 0 0.4rem 1.5rem;
+    position: relative;
+    font-size: 0.95rem;
+  }
+  .this-month li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    top: 0.4rem;
+    color: var(--green);
+    font-weight: 700;
+  }
+
+  .index ul {
+    columns: 2;
+    column-gap: 1.5rem;
+    list-style: none;
+  }
+  @media (min-width: 700px) { .index ul { columns: 3; } }
+  @media (min-width: 1000px) { .index ul { columns: 4; } }
+  .index li { padding: 0.3rem 0; break-inside: avoid; font-size: 0.9rem; }
+  .index a { color: var(--text); text-decoration: none; }
+  .index a:hover { color: var(--green); text-decoration: underline; }
+  .index .qty { color: var(--gray); font-size: 0.8rem; margin-left: 0.25rem; }
+
+  .month-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    margin-bottom: 1.25rem;
+    border-bottom: 2px solid #eee;
+    overflow-x: auto;
+  }
+  .month-tab {
+    padding: 0.5rem 0.85rem;
+    cursor: pointer;
+    border: none;
+    background: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--gray);
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    white-space: nowrap;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .month-tab:hover { color: var(--green); }
+  .month-tab.active { color: var(--green); border-bottom-color: var(--green); }
+  .month-content { display: none; }
+  .month-content.active { display: block; }
+  .month-content ul { margin-left: 1.25rem; }
+  .month-content li { padding: 0.2rem 0; font-size: 0.9rem; }
+  .month-content .empty { color: var(--gray); font-style: italic; font-size: 0.9rem; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    gap: 1.25rem;
+  }
+  .card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .card:hover { transform: translateY(-2px); box-shadow: var(--card-shadow-hover); }
+
+  .carousel {
+    position: relative;
+    width: 100%;
+    height: 240px;
+    background: #e9e5df;
+    overflow: hidden;
+  }
+  .carousel img {
+    width: 100%;
+    height: 240px;
+    object-fit: cover;
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  .carousel img.active { display: block; }
+  .carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0,0,0,0.45);
+    color: white;
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s;
+    z-index: 2;
+    line-height: 1;
+  }
+  .carousel:hover .carousel-btn { opacity: 1; }
+  .carousel-btn:hover { background: rgba(0,0,0,0.7); }
+  .carousel-btn.prev { left: 8px; }
+  .carousel-btn.next { right: 8px; }
+  .carousel-dots {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 6px;
+    z-index: 2;
+  }
+  .carousel-dots span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.5);
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .carousel-dots span.active { background: white; }
+
+  .card-body { padding: 1rem 1.25rem 1.25rem; }
+  .card-body h3 { font-size: 1.15rem; color: var(--text); }
+  .botanical { font-style: italic; color: var(--gray); font-size: 0.88rem; margin-bottom: 0.6rem; }
+
+  .badges { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.85rem; }
+  .badge {
+    font-size: 0.78rem;
+    padding: 0.2rem 0.55rem;
+    border-radius: 20px;
+    background: var(--gray-light);
+    color: var(--text-soft);
+    white-space: nowrap;
+  }
+
+  .at-glance {
+    font-size: 0.92rem;
+    color: var(--text);
+    margin-bottom: 0.85rem;
+    line-height: 1.5;
+  }
+  .card-block { margin-bottom: 0.85rem; }
+  .card-block:last-child { margin-bottom: 0; }
+  .card-block h4 {
+    font-size: 0.78rem;
+    color: var(--green);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.35rem;
+  }
+  .card-block ul { list-style: none; }
+  .card-block li {
+    padding: 0.2rem 0 0.2rem 1rem;
+    position: relative;
+    font-size: 0.88rem;
+    line-height: 1.45;
+  }
+  .card-block li::before {
+    content: '·';
+    position: absolute;
+    left: 0.25rem;
+    top: 0.15rem;
+    color: var(--green);
+    font-weight: 700;
+  }
+  .card-block p { font-size: 0.88rem; line-height: 1.5; color: var(--text-soft); }
+
+  footer { text-align: center; padding: 1.5rem; color: var(--gray); font-size: 0.85rem; }
+  footer a { color: var(--green); }
+
+  @media (max-width: 600px) {
+    body { padding: 0.5rem; }
+    header { padding: 1.25rem; }
+    header h1 { font-size: 1.4rem; }
+    .grid { grid-template-columns: 1fr; }
+    .panel { padding: 1rem; }
+    .carousel-btn { opacity: 0.8; }
+    .month-tabs { font-size: 0.85rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Brandon's Garden</h1>
+  <p>Year 2 in the garden — most plants should be establishing well this season.</p>
+  <div class="meta">
+    <span>Zone 6a</span>
+    <span>Planted June 2025</span>
+    <span>23 varieties</span>
+  </div>
+</header>
+
+<section class="panel this-month">
+  <h2>This Month — May</h2>
+  <p class="lede">Active growth time. Stake, thin, fertilize, and don't panic about the slow risers.</p>
+  <ul>
+    <li>Fertilize perennials and shrubs with a balanced slow-release (mid-May).</li>
+    <li>Apply Holly-tone around the rhododendrons <em>after</em> they finish blooming.</li>
+    <li>Stake delphiniums now that stems are reaching 12"+. Wait and they'll flop.</li>
+    <li>Thin phlox shoots to 4–5 strongest per clump for airflow (prevents mildew).</li>
+    <li>Refresh mulch 2–3" everywhere, kept a few inches off stems and crowns.</li>
+    <li>Watch for slugs on heuchera, delphinium, astilbe new growth — iron phosphate bait if needed.</li>
+    <li>Patience with the hibiscus — it often doesn't emerge until late May or June.</li>
+    <li>Pull sumac suckers wherever you don't want spread, while they're small.</li>
+  </ul>
+</section>
+
+<section class="panel index">
+  <h2>Plants in this garden</h2>
+  <ul>
+    <li><a href="#ilex-crenata">Japanese Holly</a> <span class="qty">× 2</span></li>
+    <li><a href="#rhododendron">Cunningham's White Rhododendron</a> <span class="qty">× 2</span></li>
+    <li><a href="#thuja">Arborvitae</a> <span class="qty">× 1</span></li>
+    <li><a href="#rhus">Fragrant Sumac</a> <span class="qty">× 5</span></li>
+    <li><a href="#spirea">Candy Corn Spirea</a> <span class="qty">× 5</span></li>
+    <li><a href="#rose">Rose</a> <span class="qty">× 1</span></li>
+    <li><a href="#hibiscus">Strawberry Smoothie Hibiscus</a> <span class="qty">× 1</span></li>
+    <li><a href="#agapanthus">Lily of the Nile</a> <span class="qty">× 6</span></li>
+    <li><a href="#hydrangea">Bobo Hydrangea</a> <span class="qty">× 3</span></li>
+    <li><a href="#hypericum">St. John's Wort</a> <span class="qty">× 1</span></li>
+    <li><a href="#baptisia">False Indigo</a> <span class="qty">× 2</span></li>
+    <li><a href="#cornus">Red Twig Dogwood</a> <span class="qty">× 1</span></li>
+    <li><a href="#digitalis">Foxglove</a></li>
+    <li><a href="#geum">Avens</a></li>
+    <li><a href="#stachys">Lamb's Ear</a></li>
+    <li><a href="#astilbe">Astilbe</a></li>
+    <li><a href="#phlox">Garden Phlox</a></li>
+    <li><a href="#aquilegia">Columbine</a></li>
+    <li><a href="#delphinium">Delphinium</a></li>
+    <li><a href="#heuchera">Coral Bells</a></li>
+    <li><a href="#leucanthemum">Shasta Daisy</a></li>
+    <li><a href="#nepeta">Catmint</a></li>
+    <li><a href="#scabiosa">Pincushion Flower</a></li>
+  </ul>
+</section>
+
+<section class="panel timeline">
+  <h2>Year Timeline</h2>
+  <p class="lede">Tap a month to see what to do. The current month is auto-selected.</p>
+  <div class="month-tabs" role="tablist">
+    <button class="month-tab" data-month="1">Jan</button>
+    <button class="month-tab" data-month="2">Feb</button>
+    <button class="month-tab" data-month="3">Mar</button>
+    <button class="month-tab" data-month="4">Apr</button>
+    <button class="month-tab" data-month="5">May</button>
+    <button class="month-tab" data-month="6">Jun</button>
+    <button class="month-tab" data-month="7">Jul</button>
+    <button class="month-tab" data-month="8">Aug</button>
+    <button class="month-tab" data-month="9">Sep</button>
+    <button class="month-tab" data-month="10">Oct</button>
+    <button class="month-tab" data-month="11">Nov</button>
+    <button class="month-tab" data-month="12">Dec</button>
+  </div>
+
+  <div class="month-content" id="month-1">
+    <ul>
+      <li>Dormant season. Plan any spring additions or mulch orders.</li>
+      <li>Knock heavy snow off arborvitae branches gently with a broom (upward sweep).</li>
+      <li>Watch for deer browsing on rhododendron and arborvitae — wrap with burlap if needed.</li>
+    </ul>
+  </div>
+  <div class="month-content" id="month-2">
+    <ul>
+      <li>Still dormant. Place any orders for spring mulch, fertilizer, plant additions.</li>
+      <li>Continue snow/ice monitoring on evergreens.</li>
+    </ul>
+  </div>
+  <div class="month-content" id="month-3">
+    <ul>
+      <li>Late winter — beginning to thaw. Avoid walking on soggy beds.</li>
+      <li>Cut 1/3 of the oldest red twig dogwood stems to the ground for brighter winter color next year.</li>
+      <li>Check for frost-heaved heuchera crowns and press them back down.</li>
+    </ul>
+  </div>
+  <div class="month-content" id="month-4">
+    <ul>
+      <li>Clear last year's dead stems from phlox, delphinium, astilbe, nepeta, geum, leucanthemum, scabiosa, columbine.</li>
+      <li>Pull mushy dead leaves off lamb's ear and tattered outer leaves off coral bells.</li>
+      <li>Prune Bobo hydrangea back by 1/3 to 1/2 (blooms on new wood).</li>
+      <li>Prune candy corn spirea back by 1/3 to 1/2.</li>
+      <li>Cut St. John's wort back to 6–12" to rejuvenate.</li>
+      <li>Do NOT prune rhododendron yet — flower buds are already set.</li>
+      <li>Do NOT touch the hibiscus — it emerges very late and looks dead until it doesn't.</li>
+      <li>Rose: wait for buds to swell, then prune back to a live outward-facing bud.</li>
+      <li>Check agapanthus crowns — Zone 8–10 plants, may not have survived winter.</li>
+    </ul>
+  </div>
+  <div class="month-content" id="month-5">
+    <ul>
+      <li>Fertilize perennials and shrubs with balanced slow-release (mid-May).</li>
+      <li>Holly-tone for rhododendrons after they finish blooming.</li>
+      <li>Rose fertilizer once leaves are fully out — repeat monthly through August.</li>
+      <li>Stake delphiniums when stems reach 12"+.</li>
+      <li>Thin phlox shoots to 4–5 strongest per clump.</li>
+      <li>Refresh mulch to 2–3" everywhere (off stems and crowns).</li>
+      <li>Slug watch on delphinium, heuchera, astilbe — iron phosphate bait is pet-safe.</li>
+      <li>Pull sumac suckers where you don't want spread.</li>
+      <li>Be patient with the hibiscus; it often doesn't emerge until late this month or next.</li>
+    </ul>
+  </div>
+  <div class="month-content" id="month-6">
+    <ul>
+      <li>Deadhead roses (encourages re-bloom), shasta daisies, geum, and scabiosa.</li>
+      <li>Cut columbine flower stems back after bloom (leave some seed heads if you want self-seeding).</li>
+      <li>Foxglove: leave some flower stalks to set seed for next generation.</li>
+      <li>Prune rhododendron now if needed — right after flowering, before next year's buds set.</li>
+      <li>Hibiscus emerging — enjoy the rapid growth, no action needed.</li>
+      <li>Begin deep watering routine (2–3× per week in dry spells, early morning).</li>
+    </ul>
+  </div>
+  <div class="month-content" id="month-7">
+    <ul>
+      <li>Deep water 2–3× per week in dry weeks. 1 inch total per week (rain + irrigation).</li>
+      <li>Deadhead continuously: roses, shasta daisy, phlox, scabiosa, geum.</li>
+      <li>Shear catmint by half after first bloom flush — it will rebloom.</li>
+      <li>Watch phlox for powdery mildew. Water at the base, not overhead.</li>
+      <li>Bobo hydrangea blooming; color shifts pink/green as flowers age — normal.</li>
+      <li>Hand-pick Japanese beetles into soapy water on roses and hibiscus (avoid bag traps — they attract more).</li>
+    </ul>
+  </div>
+  <div class="month-content" id="month-8">
+    <ul>
+      <li>Continue watering and deadheading.</li>
+      <li>Stop fertilizing by mid-August — late feeding pushes soft growth that won't harden off.</li>
+      <li>Deer watch intensifies on arborvitae and rhododendron — repellent or netting if browsing starts.</li>
+      <li>Last chance to divide overgrown clumps if you do it now (better in early fall).</li>
+    </ul>
+  </div>
+  <div class="month-content" id="month-9">
+    <ul>
+      <li>Stop deadheading roses — let final flowers form hips (signals dormancy).</li>
+      <li>Fall color show: rhus turns brilliant orange-red; dogwood leaves purple-red.</li>
+      <li>Divide overgrown perennials: geum, phlox, nepeta, astilbe. Replant immediately and water well.</li>
+      <li>Scale back watering frequency but don't stop — deep soak weekly.</li>
+      <li>Leave seed heads on leucanthemum, scabiosa, baptisia for birds and winter interest.</li>
+    </ul>
+  </div>
+  <div class="month-content" id="month-10">
+    <ul>
+      <li>Keep watering — especially evergreens (rhododendron, holly, arborvitae) before ground freezes.</li>
+      <li>Final mulch top-up to 3–4" around tender plants.</li>
+      <li>Decide on perennials: leave standing for winter habitat/interest, or cut to 4–6".</li>
+      <li>Plant any new fall additions while soil is still warm.</li>
+    </ul>
+  </div>
+  <div class="month-content" id="month-11">
+    <ul>
+      <li>Final deep watering before ground freezes — especially evergreens.</li>
+      <li>Cut hibiscus dead stems to 6" (they'll help you find the plant in spring).</li>
+      <li>Loosely tie arborvitae with twine if snow/ice load is a risk.</li>
+      <li>Wrap arborvitae or rhododendron with burlap if deer browse is severe.</li>
+      <li>Dig and overwinter agapanthus indoors (cool, dark, sparingly watered).</li>
+      <li>Do NOT prune shrubs now — wait for spring.</li>
+    </ul>
+  </div>
+  <div class="month-content" id="month-12">
+    <ul>
+      <li>Dormant. Enjoy winter structure: red twig dogwood stems, baptisia seed pods, dried hydrangea heads.</li>
+      <li>Watch for deer browsing on evergreens — peak season for damage.</li>
+      <li>Gently brush heavy snow off arborvitae branches (upward sweep, never downward).</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <h2>The Plants</h2>
+  <div class="grid">
+
+    <article class="card" id="ilex-crenata">
+      <div class="carousel">
+        <img class="active" src="images/ilex_crenata.jpg" alt="Japanese Holly — main">
+        <img src="images/ilex_crenata_2.jpg" alt="Japanese Holly — habit">
+        <img src="images/ilex_crenata_3.jpg" alt="Japanese Holly — foliage">
+      </div>
+      <div class="card-body">
+        <h3>Japanese Holly</h3>
+        <div class="botanical">Ilex crenata</div>
+        <div class="badges">
+          <span class="badge">☀️ Full–part sun</span>
+          <span class="badge">💧 Average</span>
+          <span class="badge">📏 3–4 ft</span>
+          <span class="badge">🌿 Evergreen</span>
+          <span class="badge">× 2</span>
+        </div>
+        <p class="at-glance">Compact evergreen shrub with small dark-green leaves — a low-maintenance boxwood substitute that holds shape year-round.</p>
+        <div class="card-block">
+          <h4>Check-in signs</h4>
+          <ul>
+            <li>Brown/crispy patches → winter burn or drying; scratch-test bark for green</li>
+            <li>Yellowing leaves → poor drainage or wrong pH (prefers slightly acidic)</li>
+            <li>Bare interior, green outside → normal old-leaf shed</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Watch out for</h4>
+          <ul>
+            <li>Root rot in soggy soil</li>
+            <li>Scale insects on stems</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Care notes</h4>
+          <p>Light shaping any time. No heavy pruning needed. Mulch to keep roots cool and moist; avoid wet feet.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="card" id="rhododendron">
+      <div class="carousel">
+        <img class="active" src="images/rhododendron_cunninghams_white.jpg" alt="Cunningham's White Rhododendron — main">
+        <img src="images/rhododendron_cunninghams_white_2.jpg" alt="Rhododendron in bloom">
+        <img src="images/rhododendron_cunninghams_white_3.jpg" alt="Rhododendron flowers">
+      </div>
+      <div class="card-body">
+        <h3>Cunningham's White Rhododendron</h3>
+        <div class="botanical">Rhododendron 'Cunningham's White'</div>
+        <div class="badges">
+          <span class="badge">☀️ Part shade</span>
+          <span class="badge">💧 Avg–high</span>
+          <span class="badge">📏 4–6 ft</span>
+          <span class="badge">🌸 Late May–Jun</span>
+          <span class="badge">× 2</span>
+        </div>
+        <p class="at-glance">Evergreen shrub with showy white flower trusses in late spring. Blooms on old wood — flower buds are set the summer before.</p>
+        <div class="card-block">
+          <h4>Check-in signs</h4>
+          <ul>
+            <li>Curled, droopy leaves in cold → normal cold response, perks up in warmth</li>
+            <li>Yellow leaves → soil too alkaline (needs acidic) or root rot</li>
+            <li>Black/brown leaf spots → fungal, improve airflow</li>
+            <li>Fat rounded buds at branch tips → flower buds, do not prune them off</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Watch out for</h4>
+          <ul>
+            <li>Deer (high risk in winter)</li>
+            <li>Root rot in heavy/wet soil</li>
+            <li>Lacebug damage (silvery stippling on leaves)</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Care notes</h4>
+          <p>Never prune in spring before flowers — you'll cut off this year's blooms. Prune (if needed) right after bloom. Apply Holly-tone after flowering. Mulch heavily — shallow roots dry out fast.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="card" id="thuja">
+      <div class="carousel">
+        <img class="active" src="images/thuja_occidentalis.jpg" alt="Arborvitae — main">
+        <img src="images/thuja_occidentalis_2.jpg" alt="Arborvitae whole tree">
+        <img src="images/thuja_occidentalis_3.jpg" alt="Arborvitae foliage">
+      </div>
+      <div class="card-body">
+        <h3>Arborvitae</h3>
+        <div class="botanical">Thuja occidentalis</div>
+        <div class="badges">
+          <span class="badge">☀️ Full sun</span>
+          <span class="badge">💧 Average</span>
+          <span class="badge">📏 10–15+ ft</span>
+          <span class="badge">🌿 Evergreen</span>
+          <span class="badge">× 1</span>
+        </div>
+        <p class="at-glance">Tall evergreen for screening or vertical accent. Hardy and reliable — but a favorite of deer in winter.</p>
+        <div class="card-block">
+          <h4>Check-in signs</h4>
+          <ul>
+            <li>Interior browning → normal old-needle shed</li>
+            <li>Outer browning/tips → drying, winter burn, or deer browse</li>
+            <li>Snapped branches → ice/snow load damage</li>
+            <li>Brown, brittle when bent → that section is dead</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Watch out for</h4>
+          <ul>
+            <li>Deer browse (peak in winter — biggest threat)</li>
+            <li>Spider mites in hot dry weather</li>
+            <li>Ice/snow splitting branches</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Care notes</h4>
+          <p>Light shaping only. Never cut back into bare brown wood — it won't regrow. Deep water during droughts. In winter, loosely tie branches together to prevent ice damage, or wrap with burlap if deer are a problem.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="card" id="rhus">
+      <div class="carousel">
+        <img class="active" src="images/rhus_aromatica.jpg" alt="Fragrant Sumac — main">
+        <img src="images/rhus_aromatica_2.jpg" alt="Fragrant Sumac habit">
+        <img src="images/rhus_aromatica_3.jpg" alt="Fragrant Sumac fall color">
+      </div>
+      <div class="card-body">
+        <h3>Fragrant Sumac</h3>
+        <div class="botanical">Rhus aromatica</div>
+        <div class="badges">
+          <span class="badge">☀️ Full–part sun</span>
+          <span class="badge">💧 Low</span>
+          <span class="badge">📏 2–6 ft</span>
+          <span class="badge">🍂 Fall color</span>
+          <span class="badge">× 5</span>
+        </div>
+        <p class="at-glance">Tough, deer-resistant native with aromatic foliage and brilliant orange-red fall color. Spreads by suckers.</p>
+        <div class="card-block">
+          <h4>Check-in signs</h4>
+          <ul>
+            <li>Shoots popping up outside the area → normal suckering; pull while small</li>
+            <li>Bare branches in early April → normal, leafs out by mid-late April</li>
+            <li>Wilting in summer → first-year stress; established plants are tough</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Watch out for</h4>
+          <ul>
+            <li>Aggressive spread via suckers if not managed</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Care notes</h4>
+          <p>Almost no maintenance. Prune for shape after flowering if desired. Pull suckers wherever you don't want spread — much easier when they're young and small.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="card" id="spirea">
+      <div class="carousel">
+        <img class="active" src="images/candy_corn_spirea_habit.jpg" alt="Candy Corn Spirea — habit">
+        <img src="images/candy_corn_spirea_spring_color.jpg" alt="Candy Corn Spirea spring color">
+        <img src="images/candy_corn_spirea_new_growth.jpg" alt="Candy Corn Spirea new growth">
+        <img src="images/candy_corn_spirea_flowers.jpg" alt="Candy Corn Spirea flowers">
+      </div>
+      <div class="card-body">
+        <h3>Double Play Candy Corn Spirea</h3>
+        <div class="botanical">Spiraea japonica 'NCSX1'</div>
+        <div class="badges">
+          <span class="badge">☀️ Full sun</span>
+          <span class="badge">💧 Average</span>
+          <span class="badge">📏 2–3 ft</span>
+          <span class="badge">🌸 Late spring–summer</span>
+          <span class="badge">× 5</span>
+        </div>
+        <p class="at-glance">Compact deciduous shrub with show-stopping red, orange, and yellow new foliage that ages to green. Pink flowers, repeat bloomer.</p>
+        <div class="card-block">
+          <h4>Check-in signs</h4>
+          <ul>
+            <li>Faded "candy corn" color → not enough sun</li>
+            <li>Wilting in heat → needs water (especially in first year)</li>
+            <li>Sparse blooms → didn't get a spring prune (blooms on new wood)</li>
+            <li>Bright red/orange tips in spring → the candy corn show, working as intended</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Watch out for</h4>
+          <ul>
+            <li>Aphids on new growth (spray off with water)</li>
+            <li>Powdery mildew in humid, crowded spots</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Care notes</h4>
+          <p>Prune back by 1/3 to 1/2 in early spring for dense, compact growth. Shape lightly after the first bloom flush to encourage rebloom.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="card" id="rose">
+      <div class="carousel">
+        <img class="active" src="images/rosa.jpg" alt="Rose — main">
+        <img src="images/rosa_2.jpg" alt="Rose bush">
+        <img src="images/rosa_3.jpg" alt="Rose">
+      </div>
+      <div class="card-body">
+        <h3>Rose</h3>
+        <div class="botanical">Rosa (variety unknown)</div>
+        <div class="badges">
+          <span class="badge">☀️ Full sun</span>
+          <span class="badge">💧 Avg–high</span>
+          <span class="badge">📏 Variable</span>
+          <span class="badge">🌸 Jun onward</span>
+          <span class="badge">× 1</span>
+        </div>
+        <p class="at-glance">A classic flowering shrub that needs more attention than most plants here — but pays it back in months of bloom.</p>
+        <div class="card-block">
+          <h4>Check-in signs</h4>
+          <ul>
+            <li>Yellow leaves with green veins → iron deficiency</li>
+            <li>Black spots on leaves → black spot fungus, remove affected leaves</li>
+            <li>Holes/chewed leaves → Japanese beetles or sawflies</li>
+            <li>Wilted new growth → cane borer or stem disease</li>
+            <li>Green pith when canes scratched → that wood is alive</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Watch out for</h4>
+          <ul>
+            <li>Japanese beetles (peak Jun–Aug) — hand-pick into soapy water</li>
+            <li>Black spot, powdery mildew</li>
+            <li>Aphids and deer</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Care notes</h4>
+          <p>Prune in early spring back to live wood (look for green pith and outward-facing buds). Fertilize monthly Apr–Aug with rose food. Deadhead through summer. Stop deadheading in September so hips can form.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="card" id="hibiscus">
+      <div class="carousel">
+        <img class="active" src="images/hibiscus_strawberry_smoothie.jpg" alt="Strawberry Smoothie Hibiscus">
+        <img src="images/hibiscus_strawberry_smoothie_2.jpg" alt="Hibiscus whole plant">
+        <img src="images/hibiscus_strawberry_smoothie_3.jpg" alt="Hibiscus flower">
+      </div>
+      <div class="card-body">
+        <h3>Strawberry Smoothie Hibiscus</h3>
+        <div class="botanical">Hibiscus 'Strawberry Smoothie'</div>
+        <div class="badges">
+          <span class="badge">☀️ Full sun</span>
+          <span class="badge">💧 High</span>
+          <span class="badge">📏 3–4 ft</span>
+          <span class="badge">🌸 Mid–late summer</span>
+          <span class="badge">× 1</span>
+        </div>
+        <p class="at-glance">Hardy perennial hibiscus with dinner-plate-sized pink flowers. Dies completely to the ground each winter — and emerges shockingly late in spring.</p>
+        <div class="card-block">
+          <h4>Check-in signs</h4>
+          <ul>
+            <li>Looks 100% dead in April → COMPLETELY NORMAL, don't dig it up</li>
+            <li>Still nothing by late May → still likely fine, this plant emerges as late as mid-June</li>
+            <li>Holes in leaves once growing → Japanese beetles or sawflies</li>
+            <li>Yellow leaves → too dry; this is a thirsty plant</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Watch out for</h4>
+          <ul>
+            <li>Japanese beetles (favorite snack)</li>
+            <li>Being mistaken for dead and accidentally removed (the #1 risk)</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Care notes</h4>
+          <p>Cut dead stems to 6" in late fall so you can find the plant next spring. Do NOT dig up in spring. Once it emerges, growth is fast — give it plenty of water and watch it explode.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="card" id="agapanthus">
+      <div class="carousel">
+        <img class="active" src="images/agapanthus.jpg" alt="Lily of the Nile">
+        <img src="images/agapanthus_2.jpg" alt="Agapanthus flower stalks">
+        <img src="images/agapanthus_3.jpg" alt="Agapanthus in garden">
+      </div>
+      <div class="card-body">
+        <h3>Lily of the Nile</h3>
+        <div class="botanical">Agapanthus</div>
+        <div class="badges">
+          <span class="badge">☀️ Full sun</span>
+          <span class="badge">💧 Average</span>
+          <span class="badge">📏 2–3 ft</span>
+          <span class="badge">🌸 Midsummer</span>
+          <span class="badge">⚠️ Tender (Zone 8–10)</span>
+          <span class="badge">× 6</span>
+        </div>
+        <p class="at-glance">Strap-leaved perennial with dramatic globes of blue or white flowers. Not reliably hardy in Zone 6 — needs to overwinter indoors.</p>
+        <div class="card-block">
+          <h4>Check-in signs</h4>
+          <ul>
+            <li>No green growth by mid-May → likely didn't survive winter outdoors</li>
+            <li>Mushy/brown rhizome when probed → dead</li>
+            <li>Firm white/green rhizome → alive, will leaf out</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Watch out for</h4>
+          <ul>
+            <li>Winter death in Zone 6 unless overwintered indoors</li>
+            <li>Slugs and snails on emerging leaves</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Care notes</h4>
+          <p>In November, dig the clumps and pot them up. Store in a cool dark place (40–50°F) like a basement or garage. Water sparingly through winter. Replant after the last frost in spring.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="card" id="hydrangea">
+      <div class="carousel">
+        <img class="active" src="images/bobo_hydrangea.jpg" alt="Bobo Hydrangea">
+        <img src="images/bobo_hydrangea_2.jpg" alt="Bobo Hydrangea whole shrub">
+        <img src="images/bobo_hydrangea_3.jpg" alt="Bobo Hydrangea flower panicles">
+      </div>
+      <div class="card-body">
+        <h3>Bobo Hydrangea</h3>
+        <div class="botanical">Hydrangea paniculata 'ILVOBO'</div>
+        <div class="badges">
+          <span class="badge">☀️ Full–part sun</span>
+          <span class="badge">💧 Avg–high</span>
+          <span class="badge">📏 2–3 ft</span>
+          <span class="badge">🌸 Jul–Sep</span>
+          <span class="badge">× 3</span>
+        </div>
+        <p class="at-glance">Dwarf paniculata hydrangea covered in white cone-shaped flower panicles that age to pink. Blooms on new wood — prune hard in spring.</p>
+        <div class="card-block">
+          <h4>Check-in signs</h4>
+          <ul>
+            <li>Drooping in midsummer → thirsty (paniculatas love water)</li>
+            <li>Sparse/small blooms → didn't get a spring prune, or needs more sun</li>
+            <li>Pink/green flower color in late summer → normal aging, not a problem</li>
+            <li>Brown leaf edges → leaf scorch from too-hot afternoon sun</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Watch out for</h4>
+          <ul>
+            <li>Leaf scorch in too-hot afternoons</li>
+            <li>Slugs on emerging new growth</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Care notes</h4>
+          <p>Prune back 1/3 to 1/2 in early spring to a pair of strong buds. Removes last year's spent flower heads at the same time. Mulch and water consistently through bloom season. Dried flower heads make nice winter interest if left on.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="card" id="hypericum">
+      <div class="carousel">
+        <img class="active" src="images/hypericum_2.jpg" alt="St. John's Wort">
+        <img src="images/hypericum.jpg" alt="St. John's Wort flowers">
+        <img src="images/hypericum_3.jpg" alt="St. John's Wort berries">
+      </div>
+      <div class="card-body">
+        <h3>St. John's Wort</h3>
+        <div class="botanical">Hypericum</div>
+        <div class="badges">
+          <span class="badge">☀️ Full–part sun</span>
+          <span class="badge">💧 Low–avg</span>
+          <span class="badge">📏 2–3 ft</span>
+          <span class="badge">🌸 Midsummer</span>
+          <span class="badge">× 1</span>
+        </div>
+        <p class="at-glance">Easygoing semi-evergreen with cheerful yellow flowers in summer and decorative berries afterward.</p>
+        <div class="card-block">
+          <h4>Check-in signs</h4>
+          <ul>
+            <li>Mostly bare in early spring → normal, regrows from base</li>
+            <li>Leggy growth → needs more sun or harder spring cutback</li>
+            <li>Rust-colored spots on leaves → humid-weather fungal issue (cosmetic)</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Watch out for</h4>
+          <ul>
+            <li>Leaf rust in humid summers (cosmetic, not fatal)</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Care notes</h4>
+          <p>Cut back to 6–12" in early spring to rejuvenate. Otherwise extremely low-maintenance.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="card" id="baptisia">
+      <div class="carousel">
+        <img class="active" src="images/baptisia.jpg" alt="False Indigo">
+        <img src="images/baptisia_2.jpg" alt="False Indigo habit">
+        <img src="images/baptisia_3.jpg" alt="False Indigo flowers">
+      </div>
+      <div class="card-body">
+        <h3>False Indigo</h3>
+        <div class="botanical">Baptisia australis</div>
+        <div class="badges">
+          <span class="badge">☀️ Full sun</span>
+          <span class="badge">💧 Low</span>
+          <span class="badge">📏 3–4 ft</span>
+          <span class="badge">🌸 Late spring</span>
+          <span class="badge">× 2</span>
+        </div>
+        <p class="at-glance">Long-lived native with shrub-like presence and purple-blue flower spikes. Deep taproot makes it nearly impossible to transplant — choose its spot once.</p>
+        <div class="card-block">
+          <h4>Check-in signs</h4>
+          <ul>
+            <li>No shoots by mid-May → normal, baptisia is a late emerger</li>
+            <li>Floppy stems → first-year stress; may need light staking until established</li>
+            <li>Black seed pods late summer → ornamental, leave them (they rattle in wind)</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Watch out for</h4>
+          <ul>
+            <li>Almost nothing — very pest and disease resistant</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Care notes</h4>
+          <p>Do NOT dig or move once established. Clear last year's dead stems in early spring (they snap off easily). No fertilizer needed — baptisia is a legume that fixes its own nitrogen.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="card" id="cornus">
+      <div class="carousel">
+        <img class="active" src="images/cornus_red_stix.jpg" alt="Red Twig Dogwood">
+        <img src="images/cornus_red_stix_2.jpg" alt="Red Twig Dogwood red stems">
+        <img src="images/cornus_red_stix_3.jpg" alt="Red Twig Dogwood in leaf">
+      </div>
+      <div class="card-body">
+        <h3>Red Twig Dogwood</h3>
+        <div class="botanical">Cornus sericea 'Red Stix'</div>
+        <div class="badges">
+          <span class="badge">☀️ Full–part sun</span>
+          <span class="badge">💧 Avg–high</span>
+          <span class="badge">📏 5–7 ft</span>
+          <span class="badge">❄️ Winter color</span>
+          <span class="badge">× 1</span>
+        </div>
+        <p class="at-glance">Grown mainly for vivid red winter stems that pop against snow. Tough, native, and a workhorse.</p>
+        <div class="card-block">
+          <h4>Check-in signs</h4>
+          <ul>
+            <li>Dull gray-red stems → older wood; cut some to the ground for bright color next year</li>
+            <li>Wilting in heat → not drought-tolerant, wants consistent moisture</li>
+            <li>Leaf spots in humid summers → cosmetic, improves with airflow</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Watch out for</h4>
+          <ul>
+            <li>Leaf spot in wet humid summers (cosmetic)</li>
+            <li>Scale on stems</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Care notes</h4>
+          <p>Cut 1/3 of the oldest (dullest) stems to the ground in early spring — young stems have the brightest red color. Can be cut entirely to the ground every 2–3 years for full renewal.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="card" id="digitalis">
+      <div class="carousel">
+        <img class="active" src="images/digitalis.jpg" alt="Foxglove">
+        <img src="images/digitalis_2.jpg" alt="Foxglove flower spikes">
+        <img src="images/digitalis_3.jpg" alt="Foxglove basal rosette">
+      </div>
+      <div class="card-body">
+        <h3>Foxglove</h3>
+        <div class="botanical">Digitalis purpurea</div>
+        <div class="badges">
+          <span class="badge">☀️ Part shade</span>
+          <span class="badge">💧 Average</span>
+          <span class="badge">📏 3–5 ft (spike)</span>
+          <span class="badge">🌸 Early summer</span>
+          <span class="badge">⚠️ Toxic</span>
+        </div>
+        <p class="at-glance">Cottage-garden classic with towering spires of tubular flowers. Biennial — blooms in year 2 and usually dies, but self-seeds prolifically.</p>
+        <div class="card-block">
+          <h4>Check-in signs</h4>
+          <ul>
+            <li>No flowers year 1 → normal, blooms next year</li>
+            <li>Rosette only, no spike → young plant, spike comes year 2</li>
+            <li>Small rosettes near where parents grew → self-seeded babies, leave them</li>
+            <li>Parent plant browning after bloom → end of its lifecycle, remove it</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Watch out for</h4>
+          <ul>
+            <li>All parts toxic if eaten — keep curious kids/pets aware</li>
+            <li>Slugs on rosettes</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Care notes</h4>
+          <p>Let some flower stalks set seed if you want the population to continue. Pull the parent after it browns — the next generation is already started in the rosettes nearby.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="card" id="geum">
+      <div class="carousel">
+        <img class="active" src="images/geum.jpg" alt="Avens">
+        <img src="images/geum_2.jpg" alt="Avens whole plant">
+        <img src="images/geum_3.jpg" alt="Avens flowers">
+      </div>
+      <div class="card-body">
+        <h3>Avens</h3>
+        <div class="botanical">Geum</div>
+        <div class="badges">
+          <span class="badge">☀️ Full–part sun</span>
+          <span class="badge">💧 Average</span>
+          <span class="badge">📏 1–2 ft</span>
+          <span class="badge">🌸 Late spring</span>
+        </div>
+        <p class="at-glance">Tidy clumping perennial with cheerful bowl-shaped flowers in orange, red, or yellow on wiry stems.</p>
+        <div class="card-block">
+          <h4>Check-in signs</h4>
+          <ul>
+            <li>Center of clump dying out → time to divide (every 2–3 years)</li>
+            <li>Brown leaf edges → too dry, mulch more</li>
+            <li>Fresh green basal leaves in April → one of the earlier perennials to wake up</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Watch out for</h4>
+          <ul>
+            <li>Not much — pretty trouble-free</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Care notes</h4>
+          <p>Deadhead spent flowers to extend bloom. Clear dead outer leaves in early spring, leaving the green center rosette. Divide every 2–3 years if clumps spread or center dies out.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="card" id="stachys">
+      <div class="carousel">
+        <img class="active" src="images/stachys.jpg" alt="Lamb's Ear">
+        <img src="images/stachys_2.jpg" alt="Lamb's Ear groundcover">
+        <img src="images/stachys_3.jpg" alt="Lamb's Ear silvery foliage">
+      </div>
+      <div class="card-body">
+        <h3>Lamb's Ear</h3>
+        <div class="botanical">Stachys byzantina</div>
+        <div class="badges">
+          <span class="badge">☀️ Full sun</span>
+          <span class="badge">💧 Low</span>
+          <span class="badge">📏 1 ft</span>
+          <span class="badge">🌿 Silver foliage</span>
+        </div>
+        <p class="at-glance">Spreading silvery groundcover with impossibly soft, fuzzy leaves. The texture is the point — flowers are a bonus.</p>
+        <div class="card-block">
+          <h4>Check-in signs</h4>
+          <ul>
+            <li>Mushy/brown leaves in spring → normal winter dieback; pull them off</li>
+            <li>Rotting center → too wet or poor drainage</li>
+            <li>Spreading where you don't want → pull divisions easily by hand</li>
+            <li>Fresh silvery leaves at center → healthy, growing</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Watch out for</h4>
+          <ul>
+            <li>Crown rot from excess moisture (#1 killer)</li>
+            <li>Slugs in humid summers</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Care notes</h4>
+          <p>Pull off all brown/mushy old leaves in early spring — this is the single most important task. Some gardeners cut off the flower spikes to focus energy on foliage. Easy to divide and share.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="card" id="astilbe">
+      <div class="carousel">
+        <img class="active" src="images/astilbe.jpg" alt="Astilbe">
+        <img src="images/astilbe_2.jpg" alt="Astilbe with plumes">
+        <img src="images/astilbe_3.jpg" alt="Astilbe foliage">
+      </div>
+      <div class="card-body">
+        <h3>Astilbe</h3>
+        <div class="botanical">Astilbe</div>
+        <div class="badges">
+          <span class="badge">☀️ Part–full shade</span>
+          <span class="badge">💧 High</span>
+          <span class="badge">📏 1–3 ft</span>
+          <span class="badge">🌸 Midsummer</span>
+        </div>
+        <p class="at-glance">Shade-loving perennial with ferny foliage and feathery plume flowers in pink, white, red, or lavender. The diva of the garden — demands moisture.</p>
+        <div class="card-block">
+          <h4>Check-in signs</h4>
+          <ul>
+            <li>Dramatic wilting → thirsty (even brief drying causes drama)</li>
+            <li>Brown leaf tips → too little water + too much sun</li>
+            <li>Sparse bloom → too deep in shade OR too dry</li>
+            <li>Bronze/red new spring growth → normal, that's the fresh foliage color</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Watch out for</h4>
+          <ul>
+            <li>Drought (the #1 killer)</li>
+            <li>Powdery mildew if airflow is poor</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Care notes</h4>
+          <p>Cut last year's stems and plumes to the ground in early spring. Mulch heavily for cool, moist roots. Water in any dry spell — even brief drying causes wilt. Divide every 3–4 years in spring.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="card" id="phlox">
+      <div class="carousel">
+        <img class="active" src="images/phlox.jpg" alt="Garden Phlox">
+        <img src="images/phlox_2.jpg" alt="Garden Phlox whole plant">
+        <img src="images/phlox_3.jpg" alt="Garden Phlox">
+      </div>
+      <div class="card-body">
+        <h3>Garden Phlox</h3>
+        <div class="botanical">Phlox paniculata</div>
+        <div class="badges">
+          <span class="badge">☀️ Full–part sun</span>
+          <span class="badge">💧 Avg–high</span>
+          <span class="badge">📏 2–4 ft</span>
+          <span class="badge">🌸 Mid–late summer</span>
+        </div>
+        <p class="at-glance">Tall cottage-garden classic with fragrant flower heads in pink, white, purple, or bicolor. Long bloomer when happy.</p>
+        <div class="card-block">
+          <h4>Check-in signs</h4>
+          <ul>
+            <li>White powder on leaves → powdery mildew (the #1 phlox issue)</li>
+            <li>Stems flopping → too crowded; should have been thinned</li>
+            <li>Small or sparse flowers → needs more sun, or time to divide</li>
+            <li>Tiny seedlings around the parent → self-seeded volunteers (usually revert to pinkish-purple)</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Watch out for</h4>
+          <ul>
+            <li>Powdery mildew — water at the base, never overhead</li>
+            <li>Spider mites in hot dry weather</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Care notes</h4>
+          <p>When new shoots are 6" tall, thin to 4–5 strongest stems per clump for airflow. Divide every 3–4 years. Deadhead to extend bloom and prevent seedlings (which won't come true to color).</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="card" id="aquilegia">
+      <div class="carousel">
+        <img class="active" src="images/aquilegia.jpg" alt="Columbine">
+        <img src="images/aquilegia_2.jpg" alt="Columbine in garden">
+        <img src="images/aquilegia_3.jpg" alt="Columbine foliage">
+      </div>
+      <div class="card-body">
+        <h3>Columbine</h3>
+        <div class="botanical">Aquilegia</div>
+        <div class="badges">
+          <span class="badge">☀️ Part shade</span>
+          <span class="badge">💧 Average</span>
+          <span class="badge">📏 1–3 ft</span>
+          <span class="badge">🌸 Late spring</span>
+        </div>
+        <p class="at-glance">Delicate fern-like foliage with whimsical spurred flowers. Short-lived (3–4 years) but self-seeds, so it keeps coming back in slightly different colors.</p>
+        <div class="card-block">
+          <h4>Check-in signs</h4>
+          <ul>
+            <li>Squiggly white trails on leaves → leaf miners (cosmetic)</li>
+            <li>Plant disappears after a few years → normal lifespan; check for babies nearby</li>
+            <li>White powder late in season → powdery mildew, often near end of life</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Watch out for</h4>
+          <ul>
+            <li>Leaf miners (cosmetic only)</li>
+            <li>Powdery mildew in late summer</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Care notes</h4>
+          <p>Cut back flower stems after bloom unless you want self-seeding. Cutting the whole plant to the ground after flowering often produces a flush of fresh foliage. Let some seed for the next generation.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="card" id="delphinium">
+      <div class="carousel">
+        <img class="active" src="images/delphinium.jpg" alt="Delphinium">
+        <img src="images/delphinium_2.jpg" alt="Delphinium tall spikes">
+        <img src="images/delphinium_3.jpg" alt="Delphinium">
+      </div>
+      <div class="card-body">
+        <h3>Delphinium</h3>
+        <div class="botanical">Delphinium</div>
+        <div class="badges">
+          <span class="badge">☀️ Full sun</span>
+          <span class="badge">💧 High</span>
+          <span class="badge">📏 3–6 ft</span>
+          <span class="badge">🌸 Early–mid summer</span>
+        </div>
+        <p class="at-glance">The drama queen — towering spikes in blue, purple, pink, or white. Needs staking and consistent moisture but rewards you with spectacle.</p>
+        <div class="card-block">
+          <h4>Check-in signs</h4>
+          <ul>
+            <li>Stems flopping → didn't stake early enough</li>
+            <li>Stunted growth → soil too dry or too poor</li>
+            <li>Holes in new leaves → slugs (their favorite snack)</li>
+            <li>Short bloom spikes → ran out of water during flower formation</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Watch out for</h4>
+          <ul>
+            <li>Slugs (#1 enemy of new shoots)</li>
+            <li>Strong wind — staking is non-negotiable</li>
+            <li>Powdery mildew on overcrowded clumps</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Care notes</h4>
+          <p>Stake EARLY — when stems are 12". Thin to 3–5 strongest stems per clump. After first bloom, cut spent spikes to encourage a smaller fall flush. Mulch to keep roots cool. Fertilize in spring.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="card" id="heuchera">
+      <div class="carousel">
+        <img class="active" src="images/heuchera.jpg" alt="Coral Bells">
+        <img src="images/heuchera_2.jpg" alt="Coral Bells foliage mound">
+        <img src="images/heuchera_3.jpg" alt="Coral Bells">
+      </div>
+      <div class="card-body">
+        <h3>Coral Bells</h3>
+        <div class="botanical">Heuchera</div>
+        <div class="badges">
+          <span class="badge">☀️ Part shade</span>
+          <span class="badge">💧 Average</span>
+          <span class="badge">📏 1 ft</span>
+          <span class="badge">🌸 Early summer</span>
+        </div>
+        <p class="at-glance">Grown for striking colorful foliage (purple, lime, bronze, peach) in a neat mound. Dainty bell flowers on wiry stems are a bonus.</p>
+        <div class="card-block">
+          <h4>Check-in signs</h4>
+          <ul>
+            <li>Crown pushed up out of soil → frost heave, press it back down and mulch</li>
+            <li>Tattered outer leaves in spring → normal winter wear, pull them off</li>
+            <li>Fading leaf color → not enough sun (for colorful varieties)</li>
+            <li>Wilting suddenly → root weevil damage on the crown</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Watch out for</h4>
+          <ul>
+            <li>Frost heaving (the biggest issue — check every spring)</li>
+            <li>Root weevils chewing the crown</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Care notes</h4>
+          <p>Check the crown every spring and press it back down if frost has heaved it up. Mulch around (not over) the crown. Divide every 3–4 years. Cut flower stems back after bloom.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="card" id="leucanthemum">
+      <div class="carousel">
+        <img class="active" src="images/leucanthemum.jpg" alt="Shasta Daisy">
+        <img src="images/leucanthemum_2.jpg" alt="Shasta Daisy clump in bloom">
+        <img src="images/leucanthemum_3.jpg" alt="Shasta Daisy in garden">
+      </div>
+      <div class="card-body">
+        <h3>Shasta Daisy</h3>
+        <div class="botanical">Leucanthemum</div>
+        <div class="badges">
+          <span class="badge">☀️ Full sun</span>
+          <span class="badge">💧 Average</span>
+          <span class="badge">📏 1–3 ft</span>
+          <span class="badge">🌸 Midsummer</span>
+        </div>
+        <p class="at-glance">The classic white daisy with a yellow eye. Reliable, cheerful, easy.</p>
+        <div class="card-block">
+          <h4>Check-in signs</h4>
+          <ul>
+            <li>Center of clump dying out → time to divide (every 2–3 years)</li>
+            <li>Fewer/smaller flowers each year → same; needs division</li>
+            <li>Floppy stems → too much shade or too-rich soil</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Watch out for</h4>
+          <ul>
+            <li>Aphids on stems</li>
+            <li>Crown rot in wet winters (drainage helps)</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Care notes</h4>
+          <p>Deadhead through summer to keep blooming. Cut to ground in fall or early spring. Divide every 2–3 years to keep clumps vigorous.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="card" id="nepeta">
+      <div class="carousel">
+        <img class="active" src="images/nepeta.jpg" alt="Catmint">
+        <img src="images/nepeta_2.jpg" alt="Catmint billowy mound">
+        <img src="images/nepeta_3.jpg" alt="Catmint flowers">
+      </div>
+      <div class="card-body">
+        <h3>Catmint</h3>
+        <div class="botanical">Nepeta</div>
+        <div class="badges">
+          <span class="badge">☀️ Full sun</span>
+          <span class="badge">💧 Low</span>
+          <span class="badge">📏 1–2 ft</span>
+          <span class="badge">🌸 Late spring–fall</span>
+          <span class="badge">🦌 Deer-resistant</span>
+        </div>
+        <p class="at-glance">Billowy mound of aromatic gray-green foliage with months of soft lavender-blue flowers. Deer and rabbits ignore it. Cats sometimes don't.</p>
+        <div class="card-block">
+          <h4>Check-in signs</h4>
+          <ul>
+            <li>Center splaying open → too much water or fertility; shear it back</li>
+            <li>Less bloom in summer → time to shear back by half for rebloom</li>
+            <li>Aromatic when rubbed → that's the catmint family signature</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Watch out for</h4>
+          <ul>
+            <li>Very little — one of the toughest perennials in the bed</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Care notes</h4>
+          <p>After the first flush of bloom fades (late June/July), shear the whole plant back by half. It will rebound and rebloom into fall. Clear dead growth in early spring.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="card" id="scabiosa">
+      <div class="carousel">
+        <img class="active" src="images/scabiosa.jpg" alt="Pincushion Flower">
+        <img src="images/scabiosa_2.jpg" alt="Pincushion Flower whole plant">
+        <img src="images/scabiosa_3.jpg" alt="Pincushion Flower">
+      </div>
+      <div class="card-body">
+        <h3>Pincushion Flower</h3>
+        <div class="botanical">Scabiosa</div>
+        <div class="badges">
+          <span class="badge">☀️ Full sun</span>
+          <span class="badge">💧 Low–avg</span>
+          <span class="badge">📏 1–2 ft</span>
+          <span class="badge">🌸 Late spring–fall</span>
+          <span class="badge">🦋 Pollinator favorite</span>
+        </div>
+        <p class="at-glance">Long-blooming perennial with whimsical pincushion-shaped flowers on wiry stems. A magnet for butterflies and bees.</p>
+        <div class="card-block">
+          <h4>Check-in signs</h4>
+          <ul>
+            <li>Yellowing/wilting → likely sitting in wet soil (wet feet = #1 killer)</li>
+            <li>Few flowers → soil too rich, or didn't get deadheaded</li>
+            <li>Gray-green ferny basal leaves in spring → healthy emergence</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Watch out for</h4>
+          <ul>
+            <li>Root rot in soggy soil — drainage is everything</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Care notes</h4>
+          <p>Deadhead continuously through summer for ongoing bloom. Ensure crown sits at the soil surface, never buried. Light division every 2–3 years.</p>
+        </div>
+      </div>
+    </article>
+
+  </div>
+</section>
+
+<footer>
+  <p>Brandon's Garden · <a href="../">leafnotes</a></p>
+</footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Carousels
+  document.querySelectorAll('.carousel').forEach(function(carousel) {
+    var imgs = carousel.querySelectorAll('img');
+    if (imgs.length <= 1) return;
+
+    var prev = document.createElement('button');
+    prev.className = 'carousel-btn prev';
+    prev.innerHTML = '&#8249;';
+    prev.setAttribute('aria-label', 'Previous image');
+    var next = document.createElement('button');
+    next.className = 'carousel-btn next';
+    next.innerHTML = '&#8250;';
+    next.setAttribute('aria-label', 'Next image');
+    var dots = document.createElement('div');
+    dots.className = 'carousel-dots';
+    for (var i = 0; i < imgs.length; i++) {
+      var dot = document.createElement('span');
+      if (i === 0) dot.className = 'active';
+      dot.dataset.index = i;
+      dots.appendChild(dot);
+    }
+    carousel.appendChild(prev);
+    carousel.appendChild(next);
+    carousel.appendChild(dots);
+
+    var current = 0;
+    function show(idx) {
+      imgs[current].classList.remove('active');
+      dots.children[current].classList.remove('active');
+      current = (idx + imgs.length) % imgs.length;
+      imgs[current].classList.add('active');
+      dots.children[current].classList.add('active');
+    }
+    prev.addEventListener('click', function() { show(current - 1); });
+    next.addEventListener('click', function() { show(current + 1); });
+    dots.querySelectorAll('span').forEach(function(dot) {
+      dot.addEventListener('click', function() { show(parseInt(this.dataset.index)); });
+    });
+
+    var startX = 0;
+    carousel.addEventListener('touchstart', function(e) { startX = e.touches[0].clientX; }, {passive: true});
+    carousel.addEventListener('touchend', function(e) {
+      var diff = startX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 40) show(current + (diff > 0 ? 1 : -1));
+    });
+
+    imgs.forEach(function(img, idx) {
+      img.addEventListener('error', function() {
+        img.style.display = 'none';
+        if (dots.children[idx]) dots.children[idx].style.display = 'none';
+      });
+    });
+  });
+
+  // Month tabs — current month auto-selected
+  var currentMonth = new Date().getMonth() + 1;
+  document.querySelectorAll('.month-tab').forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      document.querySelectorAll('.month-tab').forEach(function(t) { t.classList.remove('active'); });
+      document.querySelectorAll('.month-content').forEach(function(c) { c.classList.remove('active'); });
+      tab.classList.add('active');
+      var monthEl = document.getElementById('month-' + tab.dataset.month);
+      if (monthEl) monthEl.classList.add('active');
+    });
+  });
+  var currentTab = document.querySelector('.month-tab[data-month="' + currentMonth + '"]');
+  var currentContent = document.getElementById('month-' + currentMonth);
+  if (currentTab) currentTab.classList.add('active');
+  if (currentContent) currentContent.classList.add('active');
+});
+</script>
+
+</body>
+</html>

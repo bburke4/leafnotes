@@ -1,0 +1,450 @@
+<!--
+  leafnotes catalog template
+  ───────────────────────────
+  This is the structural reference for a garden catalog. Brandon's catalog
+  (../brandon/index.html) is the fully-realized example — model new catalogs
+  on it, using the placeholders here as a quick map of the sections.
+
+  Sections (in order):
+    1. <header>            — garden name, zone, plant count
+    2. .this-month         — what to do this month (driven by current date)
+    3. .index              — scannable plant list with jump links
+    4. .timeline           — 12-month accordion of tasks
+    5. <section>.plants    — one card per plant
+
+  Plant card sections (in order):
+    a. .carousel           — 1-3 images, mobile swipe + dots
+    b. <h3> + .botanical   — common name, italic botanical name
+    c. .badges             — sun, water, size, bloom, qty
+    d. .at-glance          — 1-2 sentence description
+    e. card-block "Check-in signs"  — diagnostic: symptom → cause
+    f. card-block "Watch out for"   — specific pests/diseases
+    g. card-block "Care notes"      — pruning, fertilizing, dividing
+
+  See ../CLAUDE.md for the generator workflow.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{GARDEN_NAME}} — Plant Catalog</title>
+<style>
+  :root {
+    --green: #2d6a4f;
+    --green-light: #d8f3dc;
+    --green-pale: #f0f7f4;
+    --cream: #f5f1eb;
+    --gray: #6c757d;
+    --gray-light: #f1f3f5;
+    --text: #1a1a1a;
+    --text-soft: #555;
+    --card-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    --card-shadow-hover: 0 6px 20px rgba(0,0,0,0.12);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    line-height: 1.55;
+    padding: 1rem;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  header {
+    background: var(--green);
+    color: white;
+    padding: 2rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+  }
+  header h1 { font-size: 1.85rem; margin-bottom: 0.3rem; }
+  header p { opacity: 0.92; font-size: 0.95rem; }
+  header .meta { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 0.85rem; font-size: 0.85rem; }
+  header .meta span { background: rgba(255,255,255,0.2); padding: 0.25rem 0.75rem; border-radius: 20px; }
+
+  section { margin-bottom: 1.5rem; }
+  section > h2 {
+    font-size: 1.35rem;
+    color: var(--green);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--green-light);
+  }
+
+  .panel { background: white; border-radius: 12px; padding: 1.5rem 2rem; box-shadow: var(--card-shadow); }
+  .panel h2 { color: var(--green); font-size: 1.25rem; margin-bottom: 0.5rem; border-bottom: none; padding-bottom: 0; }
+  .panel .lede { color: var(--text-soft); font-size: 0.9rem; margin-bottom: 0.85rem; }
+
+  .this-month { border-left: 5px solid var(--green); }
+  .this-month ul { list-style: none; }
+  .this-month li {
+    padding: 0.4rem 0 0.4rem 1.5rem;
+    position: relative;
+    font-size: 0.95rem;
+  }
+  .this-month li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    top: 0.4rem;
+    color: var(--green);
+    font-weight: 700;
+  }
+
+  .index ul {
+    columns: 2;
+    column-gap: 1.5rem;
+    list-style: none;
+  }
+  @media (min-width: 700px) { .index ul { columns: 3; } }
+  @media (min-width: 1000px) { .index ul { columns: 4; } }
+  .index li { padding: 0.3rem 0; break-inside: avoid; font-size: 0.9rem; }
+  .index a { color: var(--text); text-decoration: none; }
+  .index a:hover { color: var(--green); text-decoration: underline; }
+  .index .qty { color: var(--gray); font-size: 0.8rem; margin-left: 0.25rem; }
+
+  .month-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    margin-bottom: 1.25rem;
+    border-bottom: 2px solid #eee;
+    overflow-x: auto;
+  }
+  .month-tab {
+    padding: 0.5rem 0.85rem;
+    cursor: pointer;
+    border: none;
+    background: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--gray);
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    white-space: nowrap;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .month-tab:hover { color: var(--green); }
+  .month-tab.active { color: var(--green); border-bottom-color: var(--green); }
+  .month-content { display: none; }
+  .month-content.active { display: block; }
+  .month-content ul { margin-left: 1.25rem; }
+  .month-content li { padding: 0.2rem 0; font-size: 0.9rem; }
+  .month-content .empty { color: var(--gray); font-style: italic; font-size: 0.9rem; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    gap: 1.25rem;
+  }
+  .card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .card:hover { transform: translateY(-2px); box-shadow: var(--card-shadow-hover); }
+
+  .carousel {
+    position: relative;
+    width: 100%;
+    height: 240px;
+    background: #e9e5df;
+    overflow: hidden;
+  }
+  .carousel img {
+    width: 100%;
+    height: 240px;
+    object-fit: cover;
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  .carousel img.active { display: block; }
+  .carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0,0,0,0.45);
+    color: white;
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s;
+    z-index: 2;
+    line-height: 1;
+  }
+  .carousel:hover .carousel-btn { opacity: 1; }
+  .carousel-btn:hover { background: rgba(0,0,0,0.7); }
+  .carousel-btn.prev { left: 8px; }
+  .carousel-btn.next { right: 8px; }
+  .carousel-dots {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 6px;
+    z-index: 2;
+  }
+  .carousel-dots span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.5);
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .carousel-dots span.active { background: white; }
+
+  .card-body { padding: 1rem 1.25rem 1.25rem; }
+  .card-body h3 { font-size: 1.15rem; color: var(--text); }
+  .botanical { font-style: italic; color: var(--gray); font-size: 0.88rem; margin-bottom: 0.6rem; }
+
+  .badges { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.85rem; }
+  .badge {
+    font-size: 0.78rem;
+    padding: 0.2rem 0.55rem;
+    border-radius: 20px;
+    background: var(--gray-light);
+    color: var(--text-soft);
+    white-space: nowrap;
+  }
+
+  .at-glance {
+    font-size: 0.92rem;
+    color: var(--text);
+    margin-bottom: 0.85rem;
+    line-height: 1.5;
+  }
+  .card-block { margin-bottom: 0.85rem; }
+  .card-block:last-child { margin-bottom: 0; }
+  .card-block h4 {
+    font-size: 0.78rem;
+    color: var(--green);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.35rem;
+  }
+  .card-block ul { list-style: none; }
+  .card-block li {
+    padding: 0.2rem 0 0.2rem 1rem;
+    position: relative;
+    font-size: 0.88rem;
+    line-height: 1.45;
+  }
+  .card-block li::before {
+    content: '·';
+    position: absolute;
+    left: 0.25rem;
+    top: 0.15rem;
+    color: var(--green);
+    font-weight: 700;
+  }
+  .card-block p { font-size: 0.88rem; line-height: 1.5; color: var(--text-soft); }
+
+  footer { text-align: center; padding: 1.5rem; color: var(--gray); font-size: 0.85rem; }
+  footer a { color: var(--green); }
+
+  @media (max-width: 600px) {
+    body { padding: 0.5rem; }
+    header { padding: 1.25rem; }
+    header h1 { font-size: 1.4rem; }
+    .grid { grid-template-columns: 1fr; }
+    .panel { padding: 1rem; }
+    .carousel-btn { opacity: 0.8; }
+    .month-tabs { font-size: 0.85rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>{{GARDEN_NAME}}</h1>
+  <p>{{INTRO_BLURB}}</p>
+  <div class="meta">
+    <span>Zone {{ZONE}}</span>
+    <span>{{PLANTED_DATE}}</span>
+    <span>{{PLANT_COUNT}}</span>
+  </div>
+</header>
+
+<section class="panel this-month">
+  <h2>This Month — {{CURRENT_MONTH}}</h2>
+  <p class="lede">{{ONE_LINE_MONTH_SUMMARY}}</p>
+  <ul>
+    <li>{{TASK_1}}</li>
+    <li>{{TASK_2}}</li>
+  </ul>
+</section>
+
+<section class="panel index">
+  <h2>Plants in this garden</h2>
+  <ul>
+    <li><a href="#plant-id">Plant Name</a> <span class="qty">× 2</span></li>
+  </ul>
+</section>
+
+<section class="panel timeline">
+  <h2>Year Timeline</h2>
+  <div class="month-tabs" role="tablist">
+    <button class="month-tab" data-month="1">Jan</button>
+    <button class="month-tab" data-month="2">Feb</button>
+    <button class="month-tab" data-month="3">Mar</button>
+    <button class="month-tab" data-month="4">Apr</button>
+    <button class="month-tab" data-month="5">May</button>
+    <button class="month-tab" data-month="6">Jun</button>
+    <button class="month-tab" data-month="7">Jul</button>
+    <button class="month-tab" data-month="8">Aug</button>
+    <button class="month-tab" data-month="9">Sep</button>
+    <button class="month-tab" data-month="10">Oct</button>
+    <button class="month-tab" data-month="11">Nov</button>
+    <button class="month-tab" data-month="12">Dec</button>
+  </div>
+  <!-- One .month-content per month, id="month-1" through "month-12" -->
+  <div class="month-content" id="month-1">
+    <ul>
+      <li>Task for January</li>
+    </ul>
+  </div>
+  <!-- Use <p class="empty">Nothing to do this month — enjoy the dormancy.</p> if no tasks. -->
+</section>
+
+<section>
+  <h2>The Plants</h2>
+  <div class="grid">
+    <article class="card" id="plant-id">
+      <div class="carousel">
+        <img class="active" src="images/plant.jpg" alt="Plant — main">
+        <img src="images/plant_2.jpg" alt="Plant — closeup">
+        <img src="images/plant_3.jpg" alt="Plant — habit">
+      </div>
+      <div class="card-body">
+        <h3>Common Name</h3>
+        <div class="botanical">Botanical name</div>
+        <div class="badges">
+          <span class="badge">☀️ Full sun</span>
+          <span class="badge">💧 Average water</span>
+          <span class="badge">📏 2–3 ft</span>
+          <span class="badge">🌸 Jun–Aug</span>
+          <span class="badge">× 3</span>
+        </div>
+        <p class="at-glance">Short, friendly 1–2 sentence description.</p>
+
+        <div class="card-block">
+          <h4>Check-in signs</h4>
+          <ul>
+            <li>Drooping leaves → likely thirsty</li>
+            <li>Yellow leaves → check drainage or iron</li>
+            <li>Brown leaf edges → too much sun or fertilizer burn</li>
+          </ul>
+        </div>
+
+        <div class="card-block">
+          <h4>Watch out for</h4>
+          <ul>
+            <li>Slugs on new growth</li>
+            <li>Powdery mildew in humid conditions</li>
+          </ul>
+        </div>
+
+        <div class="card-block">
+          <h4>Care notes</h4>
+          <p>When to prune, fertilize, divide, mulch. Keep this short and practical — one short paragraph or 2–3 bullets.</p>
+        </div>
+      </div>
+    </article>
+  </div>
+</section>
+
+<footer>
+  <p>{{GARDEN_NAME}} · <a href="../">leafnotes</a></p>
+</footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Carousels
+  document.querySelectorAll('.carousel').forEach(function(carousel) {
+    var imgs = carousel.querySelectorAll('img');
+    if (imgs.length <= 1) return;
+
+    var prev = document.createElement('button');
+    prev.className = 'carousel-btn prev';
+    prev.innerHTML = '&#8249;';
+    prev.setAttribute('aria-label', 'Previous image');
+    var next = document.createElement('button');
+    next.className = 'carousel-btn next';
+    next.innerHTML = '&#8250;';
+    next.setAttribute('aria-label', 'Next image');
+    var dots = document.createElement('div');
+    dots.className = 'carousel-dots';
+    for (var i = 0; i < imgs.length; i++) {
+      var dot = document.createElement('span');
+      if (i === 0) dot.className = 'active';
+      dot.dataset.index = i;
+      dots.appendChild(dot);
+    }
+    carousel.appendChild(prev);
+    carousel.appendChild(next);
+    carousel.appendChild(dots);
+
+    var current = 0;
+    function show(idx) {
+      imgs[current].classList.remove('active');
+      dots.children[current].classList.remove('active');
+      current = (idx + imgs.length) % imgs.length;
+      imgs[current].classList.add('active');
+      dots.children[current].classList.add('active');
+    }
+    prev.addEventListener('click', function() { show(current - 1); });
+    next.addEventListener('click', function() { show(current + 1); });
+    dots.querySelectorAll('span').forEach(function(dot) {
+      dot.addEventListener('click', function() { show(parseInt(this.dataset.index)); });
+    });
+
+    var startX = 0;
+    carousel.addEventListener('touchstart', function(e) { startX = e.touches[0].clientX; }, {passive: true});
+    carousel.addEventListener('touchend', function(e) {
+      var diff = startX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 40) show(current + (diff > 0 ? 1 : -1));
+    });
+
+    imgs.forEach(function(img, idx) {
+      img.addEventListener('error', function() {
+        img.style.display = 'none';
+        if (dots.children[idx]) dots.children[idx].style.display = 'none';
+      });
+    });
+  });
+
+  // Month tabs — current month auto-selected
+  var currentMonth = new Date().getMonth() + 1;
+  document.querySelectorAll('.month-tab').forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      document.querySelectorAll('.month-tab').forEach(function(t) { t.classList.remove('active'); });
+      document.querySelectorAll('.month-content').forEach(function(c) { c.classList.remove('active'); });
+      tab.classList.add('active');
+      var monthEl = document.getElementById('month-' + tab.dataset.month);
+      if (monthEl) monthEl.classList.add('active');
+    });
+  });
+  var currentTab = document.querySelector('.month-tab[data-month="' + currentMonth + '"]');
+  var currentContent = document.getElementById('month-' + currentMonth);
+  if (currentTab) currentTab.classList.add('active');
+  if (currentContent) currentContent.classList.add('active');
+});
+</script>
+
+</body>
+</html>
