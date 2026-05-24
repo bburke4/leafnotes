@@ -18,7 +18,12 @@ This repo is a collection of garden plant catalogs. Each catalog lives in its ow
    - **Watch out for** — 1–3 pests, diseases, or hazards specific to this plant (e.g., "Japanese beetles," "powdery mildew if airflow is poor," "deer browse in winter").
    - **Care notes** — short paragraph: when to prune, fertilize, divide, mulch. Practical, not academic.
 
-3. **Find images** — 1–3 representative photos per plant. Save them to `<name>/images/` using snake_case filenames matched to the plant's botanical or common name (e.g., `bobo_hydrangea.jpg`, `bobo_hydrangea_2.jpg`, `bobo_hydrangea_3.jpg`). Use `WebFetch` or `WebSearch` to source. Wikimedia Commons, garden center sites, and university extension pages are good sources. Keep file sizes reasonable.
+3. **Find images** — 1–3 representative photos per plant, following this slot pattern:
+   - `plant_name.jpg` — **full plant / habit shot** (the whole shrub or clump, showing form and size).
+   - `plant_name_2.jpg` — **closeup of distinguishing feature** (flower if showy; foliage texture/color otherwise).
+   - `plant_name_3.jpg` — *optional* second feature (fall color, seed heads, in-garden context, alternate angle).
+
+   Save to `<name>/images/` using snake_case filenames matched to the plant's common name. Sources: Wikimedia Commons, university extension pages (Missouri Botanical Garden, Cornell, NCSU, UMass Extension), or reputable garden center sites. Keep file sizes reasonable (under ~300KB each).
 
 4. **Build the maintenance timeline** — 12 month-by-month task lists, customized to the actual plants in this garden. Don't just copy Brandon's timeline; tailor it. If a garden has no roses, drop the rose-specific tasks. If a garden has hibiscus, include the "patience, it emerges late" reminder in May.
 
@@ -38,6 +43,16 @@ This repo is a collection of garden plant catalogs. Each catalog lives in its ow
 6. **Generate `<name>/index.html`** — model the structure on `brandon/index.html` (the canonical fully-realized example). Use `_template/template.html` as a structural reference if helpful. Keep the styling/CSS identical across catalogs for consistency.
 
 7. **Update the root `index.html`** to add a card linking to the new garden. Match the existing `.garden-card` pattern.
+
+## Accuracy & honesty
+
+Care info varies a lot by species and cultivar, so don't bluff.
+
+- **Don't invent cultivars.** If `plants.md` says "Hydrangea (variety unknown)," write "variety unknown" in the catalog — don't promote it to "Bobo Hydrangea" based on a guess.
+- **Cross-reference at least 2 sources** before writing care notes for an unfamiliar plant. University extension sites (Missouri Botanical Garden, Cornell, NCSU, UMass Extension) are the gold standard. Garden center marketing copy is the weakest source.
+- **Never fabricate diagnostic signs.** For "check-in signs," only include symptom → cause pairs that are well-documented for the species. When in doubt, leave it out.
+- **Mark uncertainty.** When a plant ID is ambiguous (e.g., "white flowering shrub"), add a `⚠️ Needs verification` badge to the card and write care notes for the most likely genus only — not a specific species.
+- **Note when care depends on species.** Some genera (Hydrangea, Spirea, Clematis) vary dramatically in pruning needs across species. If care depends on which species, say so in the care notes rather than picking one and committing to it.
 
 ## Conventions
 

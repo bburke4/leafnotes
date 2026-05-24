@@ -38,6 +38,30 @@ leafnotes/
   - **Watch out for** — pests and diseases specific to that plant.
   - **Care notes** — when to prune, fertilize, divide.
 
+## Tips for entering plant lists
+
+When putting together a `plants.md` for a new garden:
+
+- Use **cultivar names** when known (e.g., "Bobo Hydrangea" vs. just "Hydrangea") — care varies a lot between varieties of the same genus.
+- If the planter has **receipts or plant tags**, those are the most reliable source of exact cultivars.
+- For uncertain plants, describe **what you can see**: "small shrub, purple foliage, dome-shaped." Vague is fine — much better than guessing the wrong species.
+- Mark uncertain ones with `(variety unknown)` or `?` so the catalog flags them rather than inventing details.
+- Add quantities when known (`× 3`), container sizes if relevant (`3-gal pots`), and the year planted at the top of the file.
+
+Example for a partly-known garden:
+
+```markdown
+# Martha's Garden
+
+Zone: 6a
+Planted: 2026 (new)
+
+## Plants
+- Bobo Hydrangea × 3 — small starts
+- Hydrangea (variety unknown) × 1 — bigleaf, blue flowers
+- "purple-leaf shrub, dome-shaped" × 1 — ? maybe ninebark or smokebush
+```
+
 ## Viewing
 
 Anyone with the URL can view a catalog — no GitHub account needed. Designed to be mobile-friendly.
