@@ -31,16 +31,23 @@ This repo is a collection of garden plant catalogs. Each catalog lives in its ow
 
 5. **Build the "This Month" panel** — 5–8 of the most pressing tasks for the current calendar month, pulled from the timeline plus any seasonal urgency. Today's date is in the system prompt — use it.
 
-   **Year-1 vs. established (important).** Compute the "growing season" for each plant: `current_year - planted_year + 1`. Plants in season 1 (i.e. just planted this year) need different care than established plants:
-   - Water more frequently and deeply (regardless of mature water needs).
-   - Do NOT fertilize the first year — let roots establish.
-   - Mulch heavier (3–4").
-   - Skip division/transplanting.
-   - Extra winter protection for borderline-hardy plants.
+   **Year-1 vs. established (important).** Compute the "growing season" for each plant: `current_year - planted_year + 1`. Plants in season 1 (i.e. just planted this year) need substantially different care than established plants — and the first-year guidance is the single most important content on a new-garden page.
 
-   If **any** plant is year-1, add a `<section class="panel year-one">` callout above the plant cards titled **"First-year basics"** with the universal year-1 advice. Mark each year-1 plant card with a `🌱 Year 1` badge and add a brief "Year 1 watch" line to its care notes.
+   If **any** plant is year-1, add a `<section class="panel first-year">` callout near the top (above This Month) titled **"🌱 First-year essentials"**. The watering schedule is the headline. Use a styled `.big-note` for it. Structure:
 
-   If **all** plants are year-1 (typical for a brand-new garden), make the first-year callout prominent — it's the most important panel on the page that season.
+   - **Watering schedule (the headline)**: deep daily watering for first 2 weeks (root ball not yet integrated with surrounding soil — there's nowhere for roots to pull moisture from), then every other day for the next month, then deep 2–3×/week through summer. Give the "moist 4–6 inches down when you stick a finger in" rule rather than arbitrary minutes (her hose/sprinkler may differ). Morning is best.
+   - **No fertilizer year 1** — pushes top growth roots can't support.
+   - **Mulch 2–3"** around (not on) crowns — cuts watering by ~50%.
+   - **Pruning** — minimal year 1. Plant-specific exceptions (e.g., pinch bee balm tips once for bushy shape; deadhead repeat bloomers).
+   - **Slug watch** — call out the species in this garden most vulnerable.
+   - **Don't panic if…** — list 3–5 normal-but-alarming things specific to the plants in this garden (e.g., bloodroot foliage disappears in midsummer; columbine looks ragged late summer; lupine flops in heat; "things may not bloom heavily — perennials sleep/creep/leap").
+   - **Winter prep (Oct–Nov)** — 3–4" mulch top-up before first hard frost; leave seed heads; first-winter mortality is normal.
+
+   Mark each year-1 plant card with a `🌱 Year 1` badge and end its care notes with a brief **Year 1 watch** sentence (the most relevant first-year-specific tip for that plant).
+
+   If **all** plants are year-1 (typical for a brand-new garden), make this panel the most prominent thing on the page above This Month.
+
+   **Plants in year 2+** still benefit from the same panel for any year-1 newcomers, but the panel should focus on those specific plants rather than universal advice.
 
 6. **Generate `<name>/index.html`** — model the structure on `brandon/index.html` (the canonical fully-realized example). Use `_template/template.html` as a structural reference if helpful. Keep the styling/CSS identical across catalogs for consistency.
 

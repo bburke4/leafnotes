@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#2d6a4f">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>">
+<title>Ali's Front Garden — leafnotes</title>
+<style>
+  :root {
+    --green: #2d6a4f;
+    --green-light: #d8f3dc;
+    --green-pale: #f0f7f4;
+    --cream: #f5f1eb;
+    --gray: #6c757d;
+    --gray-light: #f1f3f5;
+    --text: #1a1a1a;
+    --text-soft: #555;
+    --warn: #c05621;
+    --warn-light: #fde8d0;
+    --card-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    --card-shadow-hover: 0 6px 20px rgba(0,0,0,0.12);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    line-height: 1.55;
+    padding: 1rem;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  header {
+    background: var(--green);
+    color: white;
+    padding: 2rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+  }
+  header h1 { font-size: 1.85rem; margin-bottom: 0.3rem; }
+  header p { opacity: 0.92; font-size: 0.95rem; }
+  header .meta { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 0.85rem; font-size: 0.85rem; }
+  header .meta span { background: rgba(255,255,255,0.2); padding: 0.25rem 0.75rem; border-radius: 20px; }
+
+  section { margin-bottom: 1.5rem; }
+  section > h2 {
+    font-size: 1.35rem;
+    color: var(--green);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--green-light);
+  }
+  .panel { background: white; border-radius: 12px; padding: 1.5rem 2rem; box-shadow: var(--card-shadow); }
+  .panel h2 { color: var(--green); font-size: 1.25rem; margin-bottom: 0.5rem; border-bottom: none; padding-bottom: 0; }
+  .panel .lede { color: var(--text-soft); font-size: 0.9rem; margin-bottom: 0.85rem; }
+
+  .first-year { border-left: 5px solid #7cb342; background: var(--green-pale); }
+  .first-year h2 { color: var(--green); }
+  .first-year h3 { font-size: 1rem; color: var(--text); margin: 1rem 0 0.4rem; }
+  .first-year h3:first-of-type { margin-top: 0.5rem; }
+  .first-year p, .first-year li { font-size: 0.92rem; line-height: 1.55; }
+  .first-year ul { margin-left: 1.25rem; margin-top: 0.25rem; }
+  .first-year li { margin-bottom: 0.25rem; }
+  .first-year .big-note {
+    background: white;
+    border-left: 4px solid var(--green);
+    padding: 0.75rem 1rem;
+    margin: 0.5rem 0 0.75rem;
+    border-radius: 0 6px 6px 0;
+    font-size: 0.92rem;
+  }
+  .first-year .big-note strong { color: var(--green); }
+
+  .this-month { border-left: 5px solid var(--green); }
+  .this-month ul { list-style: none; }
+  .this-month li {
+    padding: 0.4rem 0 0.4rem 1.5rem;
+    position: relative;
+    font-size: 0.95rem;
+  }
+  .this-month li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    top: 0.4rem;
+    color: var(--green);
+    font-weight: 700;
+  }
+
+  .index ul {
+    columns: 2;
+    column-gap: 1.5rem;
+    list-style: none;
+  }
+  @media (min-width: 700px) { .index ul { columns: 3; } }
+  @media (min-width: 1000px) { .index ul { columns: 4; } }
+  .index li { padding: 0.3rem 0; break-inside: avoid; font-size: 0.9rem; }
+  .index a { color: var(--text); text-decoration: none; }
+  .index a:hover { color: var(--green); text-decoration: underline; }
+  .index .qty { color: var(--gray); font-size: 0.8rem; margin-left: 0.25rem; }
+
+  .month-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    margin-bottom: 1.25rem;
+    border-bottom: 2px solid #eee;
+    overflow-x: auto;
+  }
+  .month-tab {
+    padding: 0.75rem 1rem;
+    min-height: 44px;
+    cursor: pointer;
+    border: none;
+    background: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--gray);
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    white-space: nowrap;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .month-tab:hover { color: var(--green); }
+  .month-tab.active { color: var(--green); border-bottom-color: var(--green); }
+  .month-content { display: none; }
+  .month-content.active { display: block; }
+  .month-content ul { margin-left: 1.25rem; }
+  .month-content li { padding: 0.2rem 0; font-size: 0.9rem; }
+  .month-content .empty { color: var(--gray); font-style: italic; font-size: 0.9rem; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    gap: 1.25rem;
+  }
+  .card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .card:hover { transform: translateY(-2px); box-shadow: var(--card-shadow-hover); }
+
+  .carousel {
+    position: relative;
+    width: 100%;
+    height: 240px;
+    background: #e9e5df;
+    overflow: hidden;
+  }
+  .carousel img {
+    width: 100%;
+    height: 240px;
+    object-fit: cover;
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  .carousel img.active { display: block; }
+  .carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0,0,0,0.45);
+    color: white;
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s;
+    z-index: 2;
+    line-height: 1;
+  }
+  .carousel:hover .carousel-btn { opacity: 1; }
+  .carousel-btn:hover { background: rgba(0,0,0,0.7); }
+  .carousel-btn.prev { left: 8px; }
+  .carousel-btn.next { right: 8px; }
+  .carousel-dots {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 6px;
+    z-index: 2;
+  }
+  .carousel-dots span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.5);
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .carousel-dots span.active { background: white; }
+
+  .card-body { padding: 1rem 1.25rem 1.25rem; }
+  .card-body h3 { font-size: 1.15rem; color: var(--text); }
+  .botanical { font-style: italic; color: var(--gray); font-size: 0.88rem; margin-bottom: 0.6rem; }
+
+  .badges { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.85rem; }
+  .badge {
+    font-size: 0.78rem;
+    padding: 0.2rem 0.55rem;
+    border-radius: 20px;
+    background: var(--gray-light);
+    color: var(--text-soft);
+    white-space: nowrap;
+  }
+  .badge.warn { background: var(--warn-light); color: var(--warn); }
+
+  .at-glance {
+    font-size: 0.92rem;
+    color: var(--text);
+    margin-bottom: 0.85rem;
+    line-height: 1.5;
+  }
+  .card-block { margin-bottom: 0.85rem; }
+  .card-block:last-child { margin-bottom: 0; }
+  .card-block h4 {
+    font-size: 0.78rem;
+    color: var(--green);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.35rem;
+  }
+  .card-block.warn-block h4 { color: var(--warn); }
+  .card-block ul { list-style: none; }
+  .card-block li {
+    padding: 0.2rem 0 0.2rem 1rem;
+    position: relative;
+    font-size: 0.88rem;
+    line-height: 1.45;
+  }
+  .card-block li::before {
+    content: '·';
+    position: absolute;
+    left: 0.25rem;
+    top: 0.15rem;
+    color: var(--green);
+    font-weight: 700;
+  }
+  .card-block.warn-block li::before { color: var(--warn); }
+  .card-block p { font-size: 0.88rem; line-height: 1.5; color: var(--text-soft); }
+
+  .warn-box {
+    background: var(--warn-light);
+    border-left: 4px solid var(--warn);
+    border-radius: 0 6px 6px 0;
+    padding: 0.6rem 0.85rem;
+    margin-bottom: 0.85rem;
+    font-size: 0.88rem;
+    color: var(--warn);
+  }
+  .warn-box strong { font-weight: 700; }
+
+  .back-to-index {
+    text-align: center;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--green-light);
+  }
+  .back-to-index a {
+    color: var(--green);
+    text-decoration: none;
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+    display: inline-block;
+  }
+  .back-to-index a:hover { text-decoration: underline; }
+
+  footer { text-align: center; padding: 1.5rem; color: var(--gray); font-size: 0.85rem; }
+  footer a { color: var(--green); }
+
+  @media (max-width: 600px) {
+    body { padding: 0.5rem; }
+    header { padding: 1.25rem; }
+    header h1 { font-size: 1.4rem; }
+    .grid { grid-template-columns: 1fr; }
+    .panel { padding: 1rem; }
+    .first-year { padding: 1rem 1.25rem; }
+    .carousel-btn { opacity: 0.8; }
+    .month-tabs { font-size: 0.85rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Ali's Front Garden</h1>
+  <p>A native pollinator garden — 12 of 13 plants are NE natives, with Lily of the Valley as the one heritage exception.</p>
+  <div class="meta">
+    <span>Zone 6a</span>
+    <span>Planted May 2026</span>
+    <span>🌱 Year 1</span>
+    <span>🦋 Pollinator garden</span>
+    <span>13 plants</span>
+  </div>
+</header>
+
+<section class="panel first-year">
+  <h2>🌱 First-year essentials</h2>
+  <p class="lede">The single most important thing you can do this year: water deeply and consistently. Skip the fertilizer.</p>
+
+  <div class="big-note">
+    <strong>Watering schedule.</strong> Newly-planted root balls aren't connected to surrounding soil yet — they dry out fast and there's nowhere for roots to pull moisture from. Until those roots spread out (4–6 weeks), your watering routine is what keeps them alive.
+    <ul>
+      <li><strong>First 2 weeks (now through early June):</strong> Water deeply every day. Soak the root zone — not a light spray. Aim for soil that's moist 4–6 inches down when you stick a finger in.</li>
+      <li><strong>Mid-June through July:</strong> Every other day, deeper soaks.</li>
+      <li><strong>August onward:</strong> Deep watering 2–3× per week unless it rains 1"+ that week.</li>
+    </ul>
+    Morning is best (less evaporation, leaves dry by night which prevents disease). If you only remember to water once a day, do it in the morning.
+  </div>
+
+  <h3>No fertilizer this year</h3>
+  <p>Fertilizer pushes top growth that immature roots can't support. Let the plants put energy into roots first. You can start fertilizing in year 2 (and even then, most of these natives don't need much).</p>
+
+  <h3>Mulch is doing half the work for you</h3>
+  <p>Put down 2–3 inches of mulch (shredded bark, leaf mold, or compost) around all the plants — but keep it a few inches off the actual crowns and stems. This cuts watering needs roughly in half and suppresses weeds while plants are still small.</p>
+
+  <h3>Minimal pruning</h3>
+  <ul>
+    <li><strong>Pinch bee balm</strong> tips once in late May or early June (just snap off the top 2 inches) for a bushier, less leggy plant.</li>
+    <li><strong>Deadhead bee balm and obedient plant</strong> after first bloom for a second flush.</li>
+    <li><strong>Everything else:</strong> leave it alone, even after first bloom. Foliage and stems are still building the plant for next year.</li>
+  </ul>
+
+  <h3>Slug watch on new growth</h3>
+  <p>Slugs love new soft growth on columbine, foamflower, polemonium, and bloodroot. If you see ragged holes appearing overnight, scatter iron phosphate bait (Sluggo or similar — it's pet-safe). Beer traps also work.</p>
+
+  <h3>Don't panic if…</h3>
+  <ul>
+    <li><strong>Bloodroot foliage vanishes in midsummer</strong> — it's a spring ephemeral. Goes dormant by July and comes back next March. Mark its spot so you don't dig it up.</li>
+    <li><strong>Columbine looks ragged by late summer</strong> — cut foliage to the ground for fresh fall leaves.</li>
+    <li><strong>Lupine flops in heat</strong> — first-year drama. Will be sturdier next year.</li>
+    <li><strong>Things don't bloom heavily this year</strong> — perennials famously "sleep, creep, leap." Year 1 = sleep. Year 2 = creep. Year 3 = leap.</li>
+  </ul>
+
+  <h3>Before winter (October–November)</h3>
+  <p>Top up mulch to 3–4 inches once the ground starts to cool. Leave standing stems and seed heads — they catch snow for insulation and feed birds. First-winter mortality on new plantings is normal — don't be alarmed if you lose one or two come spring.</p>
+</section>
+
+<section class="panel this-month">
+  <h2>This Month — May 2026</h2>
+  <p class="lede">Establishment mode. Get on the daily watering routine, mulch everything, and resist the urge to fertilize.</p>
+  <ul>
+    <li>Daily deep watering — every plant, every morning. Stick a finger 4 inches into the soil; if it's dry, soak it.</li>
+    <li>Lay 2–3 inches of mulch around all plants, kept off the crowns and stems.</li>
+    <li>Pinch the top 2 inches off the bee balm in the last week of May to encourage bushier growth.</li>
+    <li>Watch for slugs on columbine, foamflower, polemonium, bloodroot — pet-safe iron phosphate bait if you see damage.</li>
+    <li>Bloodroot is finishing its bloom and may already be browning — that's the cue it's going dormant. Mark its location.</li>
+    <li>Enjoy the columbine and polemonium bloom — these are peak this month.</li>
+    <li>Don't dig, don't move, don't fertilize. The plants need to commit to where they are.</li>
+  </ul>
+</section>
+
+<section class="panel index" id="plant-index">
+  <h2>Plants in this garden</h2>
+  <ul>
+    <li><a href="#bee-balm">Bee Balm</a> <span class="qty">× 1</span></li>
+    <li><a href="#lupine">Wild Lupine</a> <span class="qty">× 1</span></li>
+    <li><a href="#columbine">Wild Columbine</a> <span class="qty">× 2</span></li>
+    <li><a href="#false-indigo">False Indigo</a> <span class="qty">× 1</span></li>
+    <li><a href="#polemonium">Jacob's Ladder 'Hurricane'</a> <span class="qty">× 1</span></li>
+    <li><a href="#lily-of-the-valley">Lily of the Valley ⚠️</a> <span class="qty">× 1</span></li>
+    <li><a href="#milkweed">Butterfly Milkweed</a> <span class="qty">× 1</span></li>
+    <li><a href="#foamflower">Foamflower</a> <span class="qty">× 1</span></li>
+    <li><a href="#false-dragonhead">Obedient Plant</a> <span class="qty">× 1</span></li>
+    <li><a href="#tradescantia">Spiderwort</a> <span class="qty">× 1</span></li>
+    <li><a href="#golden-alexander">Golden Alexander</a> <span class="qty">× 1</span></li>
+    <li><a href="#bloodroot">Bloodroot</a> <span class="qty">× 1</span></li>
+  </ul>
+</section>
+
+<section class="panel timeline">
+  <h2>Year Timeline</h2>
+  <p class="lede">Tap a month to see what to do. The current month is auto-selected.</p>
+  <div class="month-tabs" role="tablist">
+    <button class="month-tab" data-month="1">Jan</button>
+    <button class="month-tab" data-month="2">Feb</button>
+    <button class="month-tab" data-month="3">Mar</button>
+    <button class="month-tab" data-month="4">Apr</button>
+    <button class="month-tab" data-month="5">May</button>
+    <button class="month-tab" data-month="6">Jun</button>
+    <button class="month-tab" data-month="7">Jul</button>
+    <button class="month-tab" data-month="8">Aug</button>
+    <button class="month-tab" data-month="9">Sep</button>
+    <button class="month-tab" data-month="10">Oct</button>
+    <button class="month-tab" data-month="11">Nov</button>
+    <button class="month-tab" data-month="12">Dec</button>
+  </div>
+
+  <div class="month-content" id="month-1">
+    <ul>
+      <li>Dormant. Most of the garden is invisible right now — that's normal for natives.</li>
+      <li>Check that mulch stayed in place after winter storms; top up if it blew off.</li>
+    </ul>
+  </div>
+  <div class="month-content" id="month-2">
+    <ul>
+      <li>Still dormant. Order any new mulch or plants for spring additions.</li>
+    </ul>
+  </div>
+  <div class="month-content" id="month-3">
+    <ul>
+      <li>Bloodroot is the first to emerge — pure white flowers may appear before the leaves unfold. Easy to miss.</li>
+      <li>Resist walking on beds — they're soggy and you'll compact the soil.</li>
+    </ul>
+  </div>
+  <div class="month-content" id="month-4">
+    <ul>
+      <li>Foamflower and polemonium emerging.</li>
+      <li>Columbine basal foliage filling in.</li>
+      <li>Clear last year's dead stems from spiderwort, dragonhead, bee balm. They snap off easily.</li>
+      <li>Watch for early slug activity on emerging shoots — bait if you see damage.</li>
+    </ul>
+  </div>
+  <div class="month-content" id="month-5">
+    <ul>
+      <li>Peak bloom for bloodroot (early), columbine, polemonium, golden alexander.</li>
+      <li>Foamflower blooming — bottlebrush white spikes above the foliage.</li>
+      <li>Lupine and false indigo sending up flower spikes.</li>
+      <li>Pinch bee balm tips in the last week to encourage bushy growth.</li>
+      <li>Watch lily of the valley — it spreads fast in spring. Pull or transplant runners straying into other plants' space.</li>
+    </ul>
+  </div>
+  <div class="month-content" id="month-6">
+    <ul>
+      <li>Bloodroot foliage yellowing and going dormant — this is normal. Mark its spot.</li>
+      <li>Lupine and false indigo peak bloom.</li>
+      <li>Spiderwort blooming each morning (flowers close by afternoon).</li>
+      <li>Milkweed shoots growing tall — flower buds forming.</li>
+      <li>Switch from daily to every-other-day watering as roots establish.</li>
+      <li>Deadhead spent lupine spikes (don't expect rebloom but it tidies up).</li>
+    </ul>
+  </div>
+  <div class="month-content" id="month-7">
+    <ul>
+      <li>Bee balm peak — bright tubular flowers, hummingbird magnet.</li>
+      <li>Milkweed blooming — bright orange umbels. Watch for monarch eggs and caterpillars on the leaves!</li>
+      <li>Lupine and false indigo seed pods forming (false indigo's are ornamental — leave them).</li>
+      <li>Cut spent bee balm flowers for a possible second flush.</li>
+      <li>Deep water 2–3× per week if it's been dry.</li>
+    </ul>
+  </div>
+  <div class="month-content" id="month-8">
+    <ul>
+      <li>Obedient plant blooming — pink spikes you can twist on the stem (hence the name).</li>
+      <li>Bee balm may show powdery mildew — improve airflow, water at the base not overhead.</li>
+      <li>Columbine looking ragged — you can cut it down to the basal foliage for fresh leaves.</li>
+      <li>Monarch caterpillar season on milkweed — leave the chewed leaves; this is the point!</li>
+      <li>Stop deadheading milkweed and golden alexander; let seed heads form.</li>
+    </ul>
+  </div>
+  <div class="month-content" id="month-9">
+    <ul>
+      <li>Obedient plant still going — pull runners if it's spreading where you don't want.</li>
+      <li>False indigo black seed pods rattling in the wind — beautiful, leave them for winter.</li>
+      <li>Milkweed pods forming and splitting — wisps of silk-attached seeds release.</li>
+      <li>Last chance to do any moving/dividing (better to wait till spring, honestly).</li>
+    </ul>
+  </div>
+  <div class="month-content" id="month-10">
+    <ul>
+      <li>Foliage browning across most plants — frost will finish them off.</li>
+      <li>Leave stems standing for habitat, seed heads for birds, and winter interest.</li>
+      <li>Top up mulch to 3–4 inches around tender or borderline-hardy plants.</li>
+      <li>Final deep watering before ground freezes — especially anything still actively growing.</li>
+    </ul>
+  </div>
+  <div class="month-content" id="month-11">
+    <ul>
+      <li>Final mulch top-up if not done.</li>
+      <li>Do NOT cut everything down — leave seed heads (false indigo, milkweed, golden alexander, dragonhead) for winter interest and bird food.</li>
+      <li>Optional: cut bee balm down to 6" to limit reseeding into where you don't want it.</li>
+    </ul>
+  </div>
+  <div class="month-content" id="month-12">
+    <ul>
+      <li>Dormant. The garden is now seed pods, dried stems, and snow. That's the point — winter habitat for beneficial insects.</li>
+      <li>Watch lily of the valley patch line — if winter is mild, it can start to push.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <h2>The Plants</h2>
+  <div class="grid">
+
+    <article class="card" id="bee-balm">
+      <div class="carousel">
+        <img class="active" src="images/bee_balm.jpg" alt="Bee Balm — habit">
+        <img src="images/bee_balm_2.jpg" alt="Bee Balm — flower closeup">
+        <img src="images/bee_balm_3.jpg" alt="Bee Balm — seedhead">
+      </div>
+      <div class="card-body">
+        <h3>Bee Balm</h3>
+        <div class="botanical">Monarda didyma</div>
+        <div class="badges">
+          <span class="badge">☀️ Full–part sun</span>
+          <span class="badge">💧 Avg–high</span>
+          <span class="badge">📏 2–4 ft</span>
+          <span class="badge">🌸 Jul–Aug</span>
+          <span class="badge">🌎 NE Native</span>
+          <span class="badge">🛠️ Easy</span>
+          <span class="badge">🌱 Year 1</span>
+          <span class="badge">🐝 Pollinator</span>
+        </div>
+        <p class="at-glance">Bright tubular flowers in red, pink, or purple that hummingbirds love. Aromatic minty leaves. Spreads by rhizomes — happily forms a patch.</p>
+        <div class="card-block">
+          <h4>Check-in signs</h4>
+          <ul>
+            <li>White powder on leaves → powdery mildew (the #1 bee balm issue)</li>
+            <li>Wilting in afternoon → thirsty; bee balm doesn't like to dry out</li>
+            <li>Tall floppy stems → didn't get pinched; will be fixed by year 2</li>
+            <li>Yellow lower leaves → normal late-summer aging, especially after mildew</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Watch out for</h4>
+          <ul>
+            <li>Powdery mildew — improve airflow; water at base, not overhead</li>
+            <li>Spreading where you don't want it (controllable but vigorous)</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Care notes</h4>
+          <p>Pinch tips once in late May for bushier growth. Deadhead for a second flush. Cut to ground after frost — or leave 6" stubs as visual markers if reseeding is an issue. <strong>Year 1 watch:</strong> water consistently — first-year mildew often comes from drought stress.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="card" id="lupine">
+      <div class="carousel">
+        <img class="active" src="images/lupine.jpg" alt="Wild Lupine — habit">
+        <img src="images/lupine_2.jpg" alt="Wild Lupine — flower closeup">
+        <img src="images/lupine_3.jpg" alt="Wild Lupine — in setting">
+      </div>
+      <div class="card-body">
+        <h3>Wild Lupine</h3>
+        <div class="botanical">Lupinus perennis</div>
+        <div class="badges">
+          <span class="badge">☀️ Full sun</span>
+          <span class="badge">💧 Low–avg</span>
+          <span class="badge">📏 1–2 ft</span>
+          <span class="badge">🌸 May–Jun</span>
+          <span class="badge">🌎 NE Native</span>
+          <span class="badge">🛠️ Moderate</span>
+          <span class="badge">🌱 Year 1</span>
+          <span class="badge">🐝 Pollinator</span>
+        </div>
+        <p class="at-glance">Spires of blue-purple pea-like flowers above palmate leaves. The native host plant for the endangered Karner blue butterfly. Doesn't like to be moved — deep taproot.</p>
+        <div class="card-block">
+          <h4>Check-in signs</h4>
+          <ul>
+            <li>Yellowing leaves → too much water or poor drainage</li>
+            <li>Flopping in heat → first-year stress, will be sturdier in year 2</li>
+            <li>Aphids on flower spikes → spray off with water, usually harmless</li>
+            <li>Disappears after a few years → can be short-lived, often self-seeds replacements</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Watch out for</h4>
+          <ul>
+            <li>Wet feet / root rot — needs well-drained soil</li>
+            <li>Aphids on bloom stalks</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Care notes</h4>
+          <p>Don't move once planted — deep taproot. Cut spent flower stems to tidy up; let some go to seed if you want it to spread. No fertilizer needed (it's a nitrogen-fixing legume). <strong>Year 1 watch:</strong> water deeply but let soil dry between waterings — lupine hates soggy roots.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="card" id="columbine">
+      <div class="carousel">
+        <img class="active" src="images/columbine.jpg" alt="Wild Columbine — habit">
+        <img src="images/columbine_2.jpg" alt="Wild Columbine — flower closeup">
+        <img src="images/columbine_3.jpg" alt="Wild Columbine — foliage">
+      </div>
+      <div class="card-body">
+        <h3>Wild Columbine</h3>
+        <div class="botanical">Aquilegia canadensis</div>
+        <div class="badges">
+          <span class="badge">☀️ Part shade</span>
+          <span class="badge">💧 Average</span>
+          <span class="badge">📏 1–3 ft</span>
+          <span class="badge">🌸 May–Jun</span>
+          <span class="badge">🌎 NE Native</span>
+          <span class="badge">🛠️ Easy</span>
+          <span class="badge">🌱 Year 1</span>
+          <span class="badge">🐝 Hummingbird favorite</span>
+          <span class="badge">× 2</span>
+        </div>
+        <p class="at-glance">Nodding red-and-yellow flowers with distinctive long spurs that hummingbirds reach into. Delicate blue-green foliage. Short-lived (3–4 years) but self-seeds reliably.</p>
+        <div class="card-block">
+          <h4>Check-in signs</h4>
+          <ul>
+            <li>Squiggly white trails on leaves → leaf miners (cosmetic)</li>
+            <li>Ragged/yellowed foliage by late summer → normal; cut to ground for fresh leaves</li>
+            <li>Babies popping up nearby → self-seeded; transplant or leave as you like</li>
+            <li>Original plant disappears in year 3–4 → normal lifespan; the seedlings carry on</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Watch out for</h4>
+          <ul>
+            <li>Leaf miners (cosmetic only)</li>
+            <li>Slugs on new spring growth</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Care notes</h4>
+          <p>Cut back the whole plant after bloom for a fresh flush of foliage. Let some seed heads ripen if you want self-sowing. Very low maintenance. <strong>Year 1 watch:</strong> slugs love new growth — bait if you see ragged holes.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="card" id="false-indigo">
+      <div class="carousel">
+        <img class="active" src="images/false_indigo.jpg" alt="False Indigo — habit">
+        <img src="images/false_indigo_2.jpg" alt="False Indigo — flower">
+        <img src="images/false_indigo_3.jpg" alt="False Indigo — closeup">
+      </div>
+      <div class="card-body">
+        <h3>False Indigo</h3>
+        <div class="botanical">Baptisia australis</div>
+        <div class="badges">
+          <span class="badge">☀️ Full sun</span>
+          <span class="badge">💧 Low</span>
+          <span class="badge">📏 3–4 ft</span>
+          <span class="badge">🌸 Late spring</span>
+          <span class="badge">🌎 NA Native</span>
+          <span class="badge">🛠️ Easy</span>
+          <span class="badge">🌱 Year 1</span>
+          <span class="badge">🐝 Pollinator</span>
+        </div>
+        <p class="at-glance">Shrub-like perennial with blue-purple flower spikes and black seed pods that rattle in winter wind. Deep taproot makes it nearly impossible to transplant — pick its spot once.</p>
+        <div class="card-block">
+          <h4>Check-in signs</h4>
+          <ul>
+            <li>No shoots by mid-May → normal, it's a late emerger</li>
+            <li>Floppy stems → first-year stress; may need light staking until established</li>
+            <li>Black seed pods late summer → ornamental, leave them through winter</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Watch out for</h4>
+          <ul>
+            <li>Almost nothing — very pest- and disease-resistant</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Care notes</h4>
+          <p>Don't try to dig or move this once planted. Clear last year's dead stems in early spring (they snap off easily). No fertilizer needed — nitrogen-fixing legume. <strong>Year 1 watch:</strong> may look small and unimpressive this year — it's putting all its energy into the root system. Will explode in year 2–3.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="card" id="polemonium">
+      <div class="carousel">
+        <img class="active" src="images/polemonium_hurricane.jpg" alt="Jacob's Ladder Hurricane — habit">
+        <img src="images/polemonium_hurricane_2.jpg" alt="Jacob's Ladder — flowers">
+        <img src="images/polemonium_hurricane_3.jpg" alt="Jacob's Ladder — foliage">
+      </div>
+      <div class="card-body">
+        <h3>Jacob's Ladder 'Hurricane'</h3>
+        <div class="botanical">Polemonium reptans 'Hurricane'</div>
+        <div class="badges">
+          <span class="badge">☀️ Part shade</span>
+          <span class="badge">💧 Average</span>
+          <span class="badge">📏 1–2 ft</span>
+          <span class="badge">🌸 May</span>
+          <span class="badge">🌎 NE Native</span>
+          <span class="badge">🛠️ Easy</span>
+          <span class="badge">🌱 Year 1</span>
+        </div>
+        <p class="at-glance">A cultivar of the native creeping Jacob's Ladder with showy variegated foliage edged in cream, plus clusters of light blue spring flowers. The foliage is the year-round attraction.</p>
+        <div class="card-block">
+          <h4>Check-in signs</h4>
+          <ul>
+            <li>Leaf scorch (brown edges) → too much direct sun</li>
+            <li>Wilting in heat → needs more shade or more water</li>
+            <li>All-green leaves on some shoots → variegation reverting; cut those stems off at the base</li>
+            <li>Sparse/leggy → not enough light (variegated plants need more than all-green ones)</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Watch out for</h4>
+          <ul>
+            <li>Variegation reversion — cut out any all-green shoots</li>
+            <li>Slugs on new growth</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Care notes</h4>
+          <p>Cut spent flower stems to tidy up. The foliage stays nice all season. Mulch to keep roots cool. <strong>Year 1 watch:</strong> if leaves scorch, the spot may be too sunny — note it for possible move next spring.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="card" id="lily-of-the-valley">
+      <div class="carousel">
+        <img class="active" src="images/lily_of_the_valley.jpg" alt="Lily of the Valley — habit">
+        <img src="images/lily_of_the_valley_2.jpg" alt="Lily of the Valley — flowers">
+        <img src="images/lily_of_the_valley_3.jpg" alt="Lily of the Valley — inflorescence">
+      </div>
+      <div class="card-body">
+        <h3>Lily of the Valley</h3>
+        <div class="botanical">Convallaria majalis</div>
+        <div class="badges">
+          <span class="badge">☀️ Part–full shade</span>
+          <span class="badge">💧 Average</span>
+          <span class="badge">📏 6–12 in</span>
+          <span class="badge">🌸 May</span>
+          <span class="badge">🌎 Europe</span>
+          <span class="badge warn">⚠️ Aggressive</span>
+          <span class="badge warn">⚠️ Toxic</span>
+          <span class="badge">🌱 Year 1</span>
+        </div>
+        <p class="at-glance">Heritage shade plant with fragrant nodding white bells in May. Treasured for the scent and tradition — but the only non-native here, and it has a serious dark side.</p>
+        <div class="warn-box">
+          <strong>⚠️ All parts are toxic if eaten</strong> — cardiac glycosides, dangerous to pets and children. The red berries that form after bloom are especially tempting. Keep an eye on curious kids and dogs near this patch.
+        </div>
+        <div class="warn-box">
+          <strong>⚠️ Spreads aggressively via rhizomes</strong> — can easily overrun nearby plants. Will encroach on the foamflower, polemonium, and bloodroot patches if left unchecked. Plan to dig and divide the runners every 1–2 years, or contain with a buried barrier (root barrier or deep edging).
+        </div>
+        <div class="card-block">
+          <h4>Check-in signs</h4>
+          <ul>
+            <li>Patch expanding noticeably each year → normal, will need containment</li>
+            <li>Yellowing leaves in late summer → normal dormancy onset</li>
+            <li>Red berries after bloom → toxic, remove if pets/kids are around</li>
+            <li>Encroaching on a neighbor plant → dig out the runners, root and all</li>
+          </ul>
+        </div>
+        <div class="card-block warn-block">
+          <h4>Watch out for</h4>
+          <ul>
+            <li>Pets and children eating any part (including the berries)</li>
+            <li>Spreading into other plants' root zones</li>
+            <li>Hard to remove once established — be intentional about its footprint</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Care notes</h4>
+          <p>Each spring, walk the edge of the patch and pull any runners that have escaped into other plants. Cut spent flower stems. Leaves will yellow and disappear by August — that's normal. <strong>Year 1 watch:</strong> this is the year to set boundaries — note where it ends now so you can tell what's new spread next year.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="card" id="milkweed">
+      <div class="carousel">
+        <img class="active" src="images/milkweed.jpg" alt="Butterfly Milkweed — habit">
+        <img src="images/milkweed_2.jpg" alt="Butterfly Milkweed — flower">
+        <img src="images/milkweed_3.jpg" alt="Butterfly Milkweed — young leaf">
+      </div>
+      <div class="card-body">
+        <h3>Butterfly Milkweed</h3>
+        <div class="botanical">Asclepias tuberosa</div>
+        <div class="badges">
+          <span class="badge">☀️ Full sun</span>
+          <span class="badge">💧 Low</span>
+          <span class="badge">📏 1–2 ft</span>
+          <span class="badge">🌸 Jun–Aug</span>
+          <span class="badge">🌎 NE Native</span>
+          <span class="badge">🛠️ Easy</span>
+          <span class="badge">🌱 Year 1</span>
+          <span class="badge">🦋 Monarch host</span>
+        </div>
+        <p class="at-glance">Brilliant orange flat-topped flower clusters above narrow leaves. The host plant for monarch butterfly caterpillars — chewed leaves are a feature, not a bug. Drought-tolerant once established.</p>
+        <div class="card-block">
+          <h4>Check-in signs</h4>
+          <ul>
+            <li>Chewed leaves with yellow-black-white striped caterpillars → MONARCHS! Leave them, this is the goal</li>
+            <li>Late to emerge (May) → normal, it's a late starter</li>
+            <li>Yellow leaves → too much water (loves dry feet)</li>
+            <li>Orange aphids in clusters → oleander aphid; spray off with water</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Watch out for</h4>
+          <ul>
+            <li>Oleander aphids (the bright orange ones) — easily dislodged with a hose</li>
+            <li>Root rot in wet soil — drainage is essential</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Care notes</h4>
+          <p>Don't move it — deep taproot. Don't deadhead late in season — let seed pods form and split. Cut to ground after frost. <strong>Year 1 watch:</strong> won't get caterpillars right away while small — that's OK. Year 2+ will see monarchs.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="card" id="foamflower">
+      <div class="carousel">
+        <img class="active" src="images/foamflower.jpg" alt="Foamflower — habit">
+        <img src="images/foamflower_2.jpg" alt="Foamflower — in bloom">
+      </div>
+      <div class="card-body">
+        <h3>Foamflower</h3>
+        <div class="botanical">Tiarella cordifolia</div>
+        <div class="badges">
+          <span class="badge">☀️ Part–full shade</span>
+          <span class="badge">💧 Avg–high</span>
+          <span class="badge">📏 6–12 in</span>
+          <span class="badge">🌸 Apr–Jun</span>
+          <span class="badge">🌎 NE Native</span>
+          <span class="badge">🛠️ Easy</span>
+          <span class="badge">🌱 Year 1</span>
+        </div>
+        <p class="at-glance">Spreading shade-loving groundcover with maple-shaped leaves and frothy white bottlebrush flower spikes in spring. Spreads slowly by stolons to form a tidy patch.</p>
+        <div class="card-block">
+          <h4>Check-in signs</h4>
+          <ul>
+            <li>Crispy brown leaf edges → too much sun or too dry</li>
+            <li>Wilting → thirsty (loves consistent moisture)</li>
+            <li>Spreading runners → normal, this is how it forms a patch</li>
+            <li>Reddish tints on foliage in fall → normal seasonal color</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Watch out for</h4>
+          <ul>
+            <li>Slugs on new growth</li>
+            <li>Drying out — needs more moisture than most natives</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Care notes</h4>
+          <p>Mulch to keep roots cool and moist. Cut spent flower spikes to tidy. Foliage is semi-evergreen — leave it through winter. <strong>Year 1 watch:</strong> this is one of the thirstier plants in the bed — check it more often than the drought-tolerant ones.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="card" id="false-dragonhead">
+      <div class="carousel">
+        <img class="active" src="images/false_dragonhead.jpg" alt="Obedient Plant — habit">
+        <img src="images/false_dragonhead_2.jpg" alt="Obedient Plant — flowers">
+        <img src="images/false_dragonhead_3.jpg" alt="Obedient Plant — seeds">
+      </div>
+      <div class="card-body">
+        <h3>Obedient Plant</h3>
+        <div class="botanical">Physostegia virginiana</div>
+        <div class="badges">
+          <span class="badge">☀️ Full–part sun</span>
+          <span class="badge">💧 Avg–high</span>
+          <span class="badge">📏 3–4 ft</span>
+          <span class="badge">🌸 Aug–Sep</span>
+          <span class="badge">🌎 NE Native</span>
+          <span class="badge">🛠️ Moderate</span>
+          <span class="badge">🌱 Year 1</span>
+          <span class="badge warn">⚠️ Spreads</span>
+        </div>
+        <p class="at-glance">Tall pink flower spikes in late summer — individual flowers can be twisted on the stem and stay where you put them (hence "obedient"). Ironically, the plant itself spreads aggressively by rhizomes.</p>
+        <div class="card-block">
+          <h4>Check-in signs</h4>
+          <ul>
+            <li>Shoots popping up outside the original patch → normal spreading; pull or transplant runners</li>
+            <li>Flopping in bloom → first-year, or too rich/wet soil</li>
+            <li>Pale leaves → too much sun without enough water</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Watch out for</h4>
+          <ul>
+            <li>Aggressive spread via underground runners</li>
+            <li>Powdery mildew in crowded conditions</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Care notes</h4>
+          <p>Each spring, pull runners that have escaped beyond the desired patch. Deadhead spent spikes to extend bloom. Cut to ground after frost. <strong>Year 1 watch:</strong> won't spread much this year — but mark where the original plant sits so you can identify and pull runners in year 2.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="card" id="tradescantia">
+      <div class="carousel">
+        <img class="active" src="images/tradescantia.jpg" alt="Spiderwort — habit">
+        <img src="images/tradescantia_2.jpg" alt="Spiderwort — flower">
+        <img src="images/tradescantia_3.jpg" alt="Spiderwort — with pollinator">
+      </div>
+      <div class="card-body">
+        <h3>Spiderwort</h3>
+        <div class="botanical">Tradescantia virginiana</div>
+        <div class="badges">
+          <span class="badge">☀️ Full–part sun</span>
+          <span class="badge">💧 Average</span>
+          <span class="badge">📏 1–2 ft</span>
+          <span class="badge">🌸 May–Jul</span>
+          <span class="badge">🌎 NE Native</span>
+          <span class="badge">🛠️ Easy</span>
+          <span class="badge">🌱 Year 1</span>
+          <span class="badge">🐝 Pollinator</span>
+        </div>
+        <p class="at-glance">Grassy strap-like leaves with three-petaled blue, purple, or pink flowers each morning (they close by afternoon). A new wave of flowers opens every morning for weeks.</p>
+        <div class="card-block">
+          <h4>Check-in signs</h4>
+          <ul>
+            <li>Tatty leaves by midsummer → normal; cut to the ground for fresh fall foliage</li>
+            <li>Self-seeded babies → can be vigorous; pull volunteers you don't want</li>
+            <li>Flowers closed in afternoon → totally normal (they open new each morning)</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Watch out for</h4>
+          <ul>
+            <li>Self-seeding more than you want</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Care notes</h4>
+          <p>Cut whole plant down to 6" in midsummer for fresh foliage and possible rebloom. Very easy to divide and share. <strong>Year 1 watch:</strong> bloom should start this summer — enjoy the daily flower show.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="card" id="golden-alexander">
+      <div class="carousel">
+        <img class="active" src="images/golden_alexander.jpg" alt="Golden Alexander — flowers">
+        <img src="images/golden_alexander_2.jpg" alt="Golden Alexander — closeup">
+      </div>
+      <div class="card-body">
+        <h3>Golden Alexander</h3>
+        <div class="botanical">Zizia aurea</div>
+        <div class="badges">
+          <span class="badge">☀️ Full–part sun</span>
+          <span class="badge">💧 Average</span>
+          <span class="badge">📏 1–3 ft</span>
+          <span class="badge">🌸 May–Jun</span>
+          <span class="badge">🌎 NE Native</span>
+          <span class="badge">🛠️ Easy</span>
+          <span class="badge">🌱 Year 1</span>
+          <span class="badge">🦋 Swallowtail host</span>
+        </div>
+        <p class="at-glance">Bright yellow flat-topped flower clusters in late spring — important early-season nectar source. Host plant for black swallowtail butterfly caterpillars (similar leaves to parsley/dill).</p>
+        <div class="card-block">
+          <h4>Check-in signs</h4>
+          <ul>
+            <li>Striped green-and-yellow caterpillars on leaves → BLACK SWALLOWTAIL larvae! Leave them</li>
+            <li>Leaf damage with no caterpillars → check undersides; could be earwigs</li>
+            <li>Reddish fall color → normal late-season foliage</li>
+            <li>Seeds heavy after bloom → can self-seed mildly; pull volunteers if needed</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Watch out for</h4>
+          <ul>
+            <li>Very little — tough native, mostly trouble-free</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Care notes</h4>
+          <p>Cut to ground in late fall, or leave standing for winter interest. Tolerates a wide range of soil. <strong>Year 1 watch:</strong> won't get caterpillars while small — but expect them in year 2 onward.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="card" id="bloodroot">
+      <div class="carousel">
+        <img class="active" src="images/bloodroot.jpg" alt="Bloodroot — habit">
+        <img src="images/bloodroot_2.jpg" alt="Bloodroot — flower closeup">
+        <img src="images/bloodroot_3.jpg" alt="Bloodroot — in spring">
+      </div>
+      <div class="card-body">
+        <h3>Bloodroot</h3>
+        <div class="botanical">Sanguinaria canadensis</div>
+        <div class="badges">
+          <span class="badge">☀️ Part–full shade</span>
+          <span class="badge">💧 Average</span>
+          <span class="badge">📏 6–10 in</span>
+          <span class="badge">🌸 Mar–Apr</span>
+          <span class="badge">🌎 NE Native</span>
+          <span class="badge">🛠️ Easy</span>
+          <span class="badge">🌱 Year 1</span>
+          <span class="badge warn">⚠️ Spring ephemeral</span>
+        </div>
+        <p class="at-glance">Pure white star-shaped flowers in earliest spring, often emerging before the distinctive lobed leaf unfurls. Foliage goes completely dormant by midsummer — the plant is alive underground, just resting.</p>
+        <div class="warn-box">
+          <strong>⚠️ Foliage disappears by July.</strong> Bloodroot is a spring ephemeral — it does all its growing in the brief cool window of March–June, then goes dormant for the rest of the year. <strong>Mark the spot now</strong> so you don't dig it up by mistake later. It will be back next March.
+        </div>
+        <div class="card-block">
+          <h4>Check-in signs</h4>
+          <ul>
+            <li>Leaves yellowing in June → start of normal summer dormancy, not death</li>
+            <li>Completely gone by August → totally normal, this is what ephemerals do</li>
+            <li>Single flower lasts only a few days → normal, very short bloom</li>
+            <li>Red-orange sap when stem is cut → that's where "bloodroot" comes from (skin irritant)</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Watch out for</h4>
+          <ul>
+            <li>Accidentally digging it up when it's dormant in summer/fall — MARK the spot</li>
+            <li>Slugs on emerging spring growth</li>
+            <li>Toxic sap — wear gloves if dividing</li>
+          </ul>
+        </div>
+        <div class="card-block">
+          <h4>Care notes</h4>
+          <p>Plant or divide in early spring only (when leaves are visible). Mulch with leaf litter. Don't water in summer (it's dormant). <strong>Year 1 watch:</strong> place a small stake or plant marker where bloodroot sits so you know where it is when foliage disappears.</p>
+        </div>
+      </div>
+    </article>
+
+  </div>
+
+  <p class="back-to-index">
+    <a href="#plant-index">↑ Back to plant list</a>
+  </p>
+</section>
+
+<footer>
+  <p>Ali's Front Garden · <a href="../">leafnotes</a></p>
+</footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Carousels
+  document.querySelectorAll('.carousel').forEach(function(carousel) {
+    var imgs = carousel.querySelectorAll('img');
+    if (imgs.length <= 1) return;
+
+    var prev = document.createElement('button');
+    prev.className = 'carousel-btn prev';
+    prev.innerHTML = '&#8249;';
+    prev.setAttribute('aria-label', 'Previous image');
+    var next = document.createElement('button');
+    next.className = 'carousel-btn next';
+    next.innerHTML = '&#8250;';
+    next.setAttribute('aria-label', 'Next image');
+    var dots = document.createElement('div');
+    dots.className = 'carousel-dots';
+    for (var i = 0; i < imgs.length; i++) {
+      var dot = document.createElement('span');
+      if (i === 0) dot.className = 'active';
+      dot.dataset.index = i;
+      dots.appendChild(dot);
+    }
+    carousel.appendChild(prev);
+    carousel.appendChild(next);
+    carousel.appendChild(dots);
+
+    var current = 0;
+    function show(idx) {
+      imgs[current].classList.remove('active');
+      dots.children[current].classList.remove('active');
+      current = (idx + imgs.length) % imgs.length;
+      imgs[current].classList.add('active');
+      dots.children[current].classList.add('active');
+    }
+    prev.addEventListener('click', function() { show(current - 1); });
+    next.addEventListener('click', function() { show(current + 1); });
+    dots.querySelectorAll('span').forEach(function(dot) {
+      dot.addEventListener('click', function() { show(parseInt(this.dataset.index)); });
+    });
+
+    var startX = 0;
+    carousel.addEventListener('touchstart', function(e) { startX = e.touches[0].clientX; }, {passive: true});
+    carousel.addEventListener('touchend', function(e) {
+      var diff = startX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 40) show(current + (diff > 0 ? 1 : -1));
+    });
+
+    imgs.forEach(function(img, idx) {
+      img.addEventListener('error', function() {
+        img.style.display = 'none';
+        if (dots.children[idx]) dots.children[idx].style.display = 'none';
+      });
+    });
+  });
+
+  // Month tabs — current month auto-selected
+  var currentMonth = new Date().getMonth() + 1;
+  document.querySelectorAll('.month-tab').forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      document.querySelectorAll('.month-tab').forEach(function(t) { t.classList.remove('active'); });
+      document.querySelectorAll('.month-content').forEach(function(c) { c.classList.remove('active'); });
+      tab.classList.add('active');
+      var monthEl = document.getElementById('month-' + tab.dataset.month);
+      if (monthEl) monthEl.classList.add('active');
+    });
+  });
+  var currentTab = document.querySelector('.month-tab[data-month="' + currentMonth + '"]');
+  var currentContent = document.getElementById('month-' + currentMonth);
+  if (currentTab) currentTab.classList.add('active');
+  if (currentContent) currentContent.classList.add('active');
+});
+</script>
+
+</body>
+</html>
