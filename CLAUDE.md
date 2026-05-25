@@ -12,7 +12,9 @@ This repo is a collection of garden plant catalogs. Each catalog lives in its ow
 
 2. **For each plant, gather:**
    - Common name + botanical (Latin) name.
-   - Quick stats: sun (full/part/shade), water (low/avg/high), mature size, bloom time, quantity.
+   - Quick stats: sun (full/part/shade), water (low/avg/high), mature size, bloom time, **origin**, **maintenance level**, and quantity.
+     - **Origin** examples: `🌎 NE Native`, `🌎 NA Native`, `🌎 Asia`, `🌎 Europe`, `🌎 Hybrid`, `🌎 Mixed origin`. Be honest — "Hybrid" or "Mixed origin" is fine when a plant doesn't trace cleanly to one place.
+     - **Maintenance**: `🛠️ Easy` (set-and-forget), `🛠️ Moderate` (some seasonal attention), `🛠️ Demanding` (regular work — pruning, staking, pest control, winter protection).
    - 1–2 sentence "at a glance" description with personality.
    - **Check-in signs** — 3–5 diagnostic items in `symptom → likely cause` form. This is the signature feature. Examples: "drooping leaves → thirsty," "yellow leaves → check drainage or iron," "no growth by mid-May → late emerger, normal."
    - **Watch out for** — 1–3 pests, diseases, or hazards specific to this plant (e.g., "Japanese beetles," "powdery mildew if airflow is poor," "deer browse in winter").
